@@ -1,0 +1,120 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RecorderActivity" >
+
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:background="#971425"
+        android:orientation="horizontal"
+        android:weightSum="4" >
+        
+  	  	<Button
+	        android:id="@+id/friends_button"
+	        android:background="#971425"
+	        android:layout_width="wrap_content"
+	        android:layout_height="match_parent"
+	        android:layout_weight="1"
+	        android:textColor="#ffffff"
+	        android:text="@string/friends" />        
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:gravity="center"
+            android:text="@string/howler"
+            android:textColor="#ffffff"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+        
+        <Button
+            android:id="@+id/message_list_button"
+            android:background="#971425"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+	        android:textColor="#ffffff"            
+            android:text="@string/messages" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/play_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/audio_position"
+        android:layout_alignLeft="@+id/enter_title"
+        android:layout_marginBottom="24dp"
+        android:text="@string/play" />
+
+    <Button
+        android:id="@+id/delete_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/play_button"
+        android:layout_alignBottom="@+id/play_button"
+        android:layout_alignRight="@+id/enter_title"
+        android:text="@string/delete" />
+
+    <TextView
+        android:id="@+id/audio_pos_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/recipient_volume"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="33dp"
+        android:text="@string/set_recip_vol" />
+
+    <TextView
+        android:id="@+id/set_recip_vol_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:text="@string/set_audio_pos" />
+
+    <SeekBar
+        android:id="@+id/audio_position"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/set_recip_vol_text"
+        android:layout_alignParentLeft="true" />
+
+    <SeekBar
+        android:id="@+id/recipient_volume"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="54dp" />
+
+    <ImageButton
+        android:id="@+id/record_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/audio_pos_text"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="15dp"
+        android:padding="5dp"
+        android:src="@drawable/record_button" />
+
+    <EditText
+        android:id="@+id/enter_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/play_button"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="27dp"
+        android:ems="10"
+        android:gravity="center"
+        android:hint="@string/title_text" >
+
+        <requestFocus />
+    </EditText>
+
+</RelativeLayout>

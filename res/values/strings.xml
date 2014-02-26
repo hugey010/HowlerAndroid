@@ -4,5 +4,24 @@
     <string name="app_name">Howler</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_recorder">RecorderActivity</string>
+    <string name="login">Login</string>
+    <string name="create_user_text">Create a New User</string>
+    <string name="password">Enter Password</string>
+    <string name="username">Enter Username</string>
+    <string name="title_activity_create_account">CreateAccount</string>
+    <string name="cancel">Cancel</string>
+    <string name="done">Done</string>
+    <string name="confirm_password_text">Confirm Password</string>
+    <string name="title_activity_database_helper">DatabaseHelper</string>
+    <string name="title_activity_splash_screen">SplashScreen</string>
+    <string name="friends">Friends</string>
+    <string name="howler">Howler</string>
+    <string name="messages">Messages</string>
+    <string name="title_text">Enter Title</string>
+    <string name="play">Play</string>
+    <string name="delete">Delete</string>
+    <string name="set_recip_vol">Set Recipient Volume</string>
+    <string name="set_audio_pos">Set Audio Position</string>
 
 </resources>

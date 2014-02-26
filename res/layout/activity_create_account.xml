@@ -19,7 +19,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="@string/login"
+            android:text="@string/create_user_text"
             android:textColor="#ffffff"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -27,23 +27,23 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/login_button"
+        android:id="@+id/done_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/username_text"
         android:layout_alignRight="@+id/username_text"
-        android:layout_below="@+id/password_text"
+        android:layout_below="@+id/confirm_password_text"
         android:layout_marginTop="38dp"
-        android:text="@string/login" />
+        android:text="@string/done" />
 
     <Button
-        android:id="@+id/create_user_button"
+        android:id="@+id/cancel_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/login_button"
-        android:layout_alignRight="@+id/login_button"
-        android:layout_below="@+id/login_button"
-        android:text="@string/create_user_text" />
+        android:layout_alignLeft="@+id/done_button"
+        android:layout_alignRight="@+id/done_button"
+        android:layout_below="@+id/done_button"
+        android:text="@string/cancel" />
 
     <EditText
         android:id="@+id/password_text"
@@ -56,7 +56,19 @@
         android:hint="@string/password"
         android:inputType="textPassword" >
 
-        <requestFocus />
+    </EditText>
+    
+    <EditText
+        android:id="@+id/confirm_password_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/password_text"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:ems="10"
+        android:hint="@string/confirm_password_text"
+        android:inputType="textPassword" >
+
     </EditText>
 
     <EditText
