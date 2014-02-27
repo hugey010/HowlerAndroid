@@ -31,7 +31,6 @@ public class DatabaseHelper {
       return this.insertStmt.executeInsert();
    }
    public void deleteAll() {
-
       this.db.delete(TABLE_NAME, null, null);
    }
   

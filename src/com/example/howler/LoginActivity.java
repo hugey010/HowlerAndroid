@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -21,12 +22,42 @@ public class LoginActivity extends Activity implements OnClickListener {
 	private EditText userNameEditableField;
 	private EditText passwordEditableField;
 	private final static String OPT_NAME = "name";
+	private final static String TAG = "LoginActivity Lifecycle logs";
 
+	// bs lifecycle methods
+	@Override
+	public void onPause() {
+		super.onPause();
+		Log.d(TAG, "On Pause");
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		Log.d(TAG, "On Resume");
+	}
+	
+	@Override
+	public void onStop() {
+		super.onStop();
+		Log.d(TAG, "On Stop");
+	}
+	
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		Log.d(TAG, "On Destroy");
+	}
+	
 	//onCreate is in the Activity base class, so we use Override annotation
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		//call to onCreate of Activity super class
 		super.onCreate(savedInstanceState);
+		
+		Log.d(TAG, "On Create");
+
+		
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
