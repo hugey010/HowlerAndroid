@@ -30,8 +30,8 @@
         android:id="@+id/done_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/username_text"
-        android:layout_alignRight="@+id/username_text"
+        android:layout_alignLeft="@+id/password_text"
+        android:layout_alignRight="@+id/password_text"
         android:layout_below="@+id/confirm_password_text"
         android:layout_marginTop="38dp"
         android:text="@string/done" />
@@ -40,8 +40,8 @@
         android:id="@+id/cancel_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/done_button"
-        android:layout_alignRight="@+id/done_button"
+        android:layout_alignLeft="@+id/password_text"
+        android:layout_alignRight="@+id/password_text"
         android:layout_below="@+id/done_button"
         android:text="@string/cancel" />
 
@@ -53,10 +53,9 @@
         android:layout_centerHorizontal="true"
         android:gravity="center"
         android:ems="10"
-        android:hint="@string/password"
-        android:inputType="textPassword" >
+        android:hint="@string/password" 
+        android:inputType="textPassword" />
 
-    </EditText>
     
     <EditText
         android:id="@+id/confirm_password_text"
@@ -67,9 +66,7 @@
         android:gravity="center"
         android:ems="10"
         android:hint="@string/confirm_password_text"
-        android:inputType="textPassword" >
-
-    </EditText>
+        android:inputType="textPassword" />
 
     <EditText
         android:id="@+id/username_text"
