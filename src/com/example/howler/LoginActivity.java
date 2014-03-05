@@ -2,6 +2,9 @@ package com.example.howler;
 
 import java.util.List;
 
+import com.example.howler.WebRequest.JsonSpiceService;
+import com.octo.android.robospice.SpiceManager;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -18,12 +21,29 @@ import android.widget.Button;
 import android.widget.EditText;
 
 public class LoginActivity extends Activity implements OnClickListener {
+	
+	protected SpiceManager spiceManager = new SpiceManager(JsonSpiceService.class);
+	
+	
 	private DatabaseHelper dh;
 	private EditText userNameEditableField;
 	private EditText passwordEditableField;
 	private final static String OPT_NAME = "name";
 	private final static String TAG = "LoginActivity Lifecycle logs";
 
+	@Override
+	public void onStart() {
+		super.onStart();
+		 spiceManager.start(this);
+	}
+	
+	@Override
+	public void onStop() {
+		super.onStop();
+		 spiceManager.shouldStop();
+		Log.d(TAG, "On Stop");
+	}
+	
 	// bs lifecycle methods
 	@Override
 	public void onPause() {
@@ -35,12 +55,6 @@ public class LoginActivity extends Activity implements OnClickListener {
 	public void onResume() {
 		super.onResume();
 		Log.d(TAG, "On Resume");
-	}
-	
-	@Override
-	public void onStop() {
-		super.onStop();
-		Log.d(TAG, "On Stop");
 	}
 	
 	@Override

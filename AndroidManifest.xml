@@ -41,6 +41,10 @@
             android:name="com.example.howler.SplashScreen"
             android:label="@string/title_activity_splash_screen" >
         </activity>
+        
+        <service
+  			android:name="com$example$howler$WebRequest$JsonSpiceService"
+  			android:exported="false" />
     </application>
-
+   
 </manifest>
