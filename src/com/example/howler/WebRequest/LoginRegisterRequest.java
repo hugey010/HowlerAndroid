@@ -13,7 +13,8 @@ public class LoginRegisterRequest extends SpringAndroidSpiceRequest<User> {
 
 	@Override
 	public User loadDataFromNetwork() throws Exception {
-		return getRestTemplate().postForObject(JsonSpiceService.baseURL, this.user, User.class);
+		String url = JsonSpiceService.baseURL + "users";
+		return getRestTemplate().postForObject(url, this.user, User.class);
 	}
 
 }

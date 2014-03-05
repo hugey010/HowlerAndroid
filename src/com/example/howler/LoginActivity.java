@@ -3,7 +3,12 @@ package com.example.howler;
 import java.util.List;
 
 import com.example.howler.WebRequest.JsonSpiceService;
+import com.example.howler.WebRequest.LoginRegisterRequest;
+import com.example.howler.WebRequest.User;
 import com.octo.android.robospice.SpiceManager;
+import com.octo.android.robospice.persistence.DurationInMillis;
+import com.octo.android.robospice.persistence.exception.SpiceException;
+import com.octo.android.robospice.request.listener.RequestListener;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -88,24 +93,13 @@ public class LoginActivity extends Activity implements OnClickListener {
 		btnNewUser.setOnClickListener(this);
 	}
 
-	private void checkLogin() {
-		String username = this.userNameEditableField.getText().toString();
-		String password = this.passwordEditableField.getText().toString();
-		this.dh = new DatabaseHelper(this);
-		List<String> names = this.dh.selectAll(username, password);
-		if (names.size() > 0) { // Login successful
-			// Save username as the name of the player
-			SharedPreferences settings = PreferenceManager
-					.getDefaultSharedPreferences(this);
-			SharedPreferences.Editor editor = settings.edit();
-			editor.putString(OPT_NAME, username);
-			editor.commit();
-
-			//TODO: bring up next RecorderActivity
-			startActivity(new Intent(this, RecorderActivity.class));
-			
-			//finish deletes the current instance
-			finish();
+	private User makeUser() {
+		User user = new User();
+		user.setUsername(this.userNameEditableField.getText().toString());
+		user.setPassword(this.passwordEditableField.getText().toString());
+		// TODO: need to do email too!
+		if (user.validLogin()) {
+			return user;
 		} else {
 			// Try again?
 			new AlertDialog.Builder(this)
@@ -118,12 +112,38 @@ public class LoginActivity extends Activity implements OnClickListener {
 								}
 							}).show();
 		}
+		return null;
 	}
+	
+	private void performLoginRegistration(User user) {
+		  LoginActivity.this.setProgressBarIndeterminateVisibility(true);
+		  LoginRegisterRequest request = new LoginRegisterRequest(user);
+		  spiceManager.execute(request, user, DurationInMillis.ALWAYS_EXPIRED, new LoginRegisterRequestListener());
+	}
+	
+	private class LoginRegisterRequestListener implements RequestListener<User> {
+
+		  @Override
+		  public void onRequestFailure(SpiceException e) {
+		    //update your UI
+			  Log.d(TAG, e.getMessage());
+		  }
+
+		  @Override
+		  public void onRequestSuccess(User user) {
+		    //update your UI
+			  if (user != null)
+			  Log.d(TAG, "user.class = " + user.getClass() + " + user.message = " + user.getMessage());
+		  }
+		}
 
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.login_button:
-			checkLogin();
+			User user = makeUser();
+			if (user != null) {
+				performLoginRegistration(user);
+			}
 			break;
 		case R.id.create_user_button:
 			startActivity(new Intent(this, CreateAccount.class));

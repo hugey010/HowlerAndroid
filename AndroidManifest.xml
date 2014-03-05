@@ -3,7 +3,10 @@
     package="com.example.howler"
     android:versionCode="1"
     android:versionName="1.0" >
-
+    
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+	<uses-permission android:name="android.permission.INTERNET"/>
+	
     <uses-sdk
         android:minSdkVersion="8"
         android:targetSdkVersion="18" />
@@ -43,7 +46,7 @@
         </activity>
         
         <service
-  			android:name="com$example$howler$WebRequest$JsonSpiceService"
+  			android:name="com.example.howler.WebRequest.JsonSpiceService"
   			android:exported="false" />
     </application>
    

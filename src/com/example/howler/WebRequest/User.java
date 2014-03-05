@@ -1,5 +1,8 @@
 package com.example.howler.WebRequest;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class User {
 	
 	private String username;
@@ -8,7 +11,13 @@ public class User {
 	private String tempPassword;
 	private String authtoken;
 	private String email;
+	
 	private boolean pending;
+	private String message;
+	
+	public boolean validLogin() {
+		return username.length() > 3 && password.length() > 3;
+	}
 	
 	public String getUsername() {
 		return username;
@@ -52,7 +61,10 @@ public class User {
 	public void setPending(boolean pending) {
 		this.pending = pending;
 	}
-	
-	
-
+	public String getMessage() {
+		return message;
+	}
+	public void setMessage(String message) {
+		this.message = message;
+	}
 }
