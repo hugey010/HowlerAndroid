@@ -9,22 +9,26 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Use this class to perform database actions based on web requests.
+ * Whatever the user does really shouldn't be stored locally unless the server confirms it.
+ * 
+ * @author Tyler Hugenberg
+ *
+ */
 public class DatabaseHelper {
-   private static final String DATABASE_NAME = "TicTacToe.db";
-   private static final int DATABASE_VERSION = 1;
-   private static final String TABLE_NAME = "Accounts";
+	private static final String TAG = "DatabaseHelper";
+	
    private Context context;
    private SQLiteDatabase db;
-   private SQLiteStatement insertStmt;
-   private static final String INSERT = "insert into " + TABLE_NAME + "(name, password) values (?, ?)" ;
    
    public DatabaseHelper(Context context) {
       this.context = context;
-      TicTacToeOpenHelper openHelper = new TicTacToeOpenHelper(this.context);
+      HowlerDatabaseHelper openHelper = new HowlerDatabaseHelper(this.context);
       this.db = openHelper.getWritableDatabase();
-      this.insertStmt = this.db.compileStatement(INSERT);
    }
 
+   /*
    public long insert(String name, String password) {
       this.insertStmt.bindString(1, name);
       this.insertStmt.bindString(2, password);
@@ -48,23 +52,28 @@ public class DatabaseHelper {
       }
       return list;
    }
+   */
    
-   private static class TicTacToeOpenHelper extends SQLiteOpenHelper {
-	   TicTacToeOpenHelper(Context context) {
+   private static class HowlerDatabaseHelper extends SQLiteOpenHelper {
+	   
+	   public static final int DATABASE_VERSION = 1;
+	   public static final String DATABASE_NAME = "HowlerDatabase.db";
+	   
+	   HowlerDatabaseHelper(Context context) {
     	  super(context, DATABASE_NAME, null, DATABASE_VERSION);
       }
 
       @Override
       public void onCreate(SQLiteDatabase db) {
-         db.execSQL("CREATE TABLE " + TABLE_NAME + "(id INTEGER PRIMARY KEY, name TEXT, password TEXT)");
+    	  // first database creation
+    	  // create all tables
+    	  db.execSQL("CREATE TABLE users (identifier INTEGER PRIMARY KEY, username TEXT, authtoken TEXT, email TEXT)");
+    	  //db.execSQL("CREATE TABLE messages (identifier INTEGER PRIMARY KEY, user_id INTEGER, timestamp TEXT, data BLOB, title TEXT, volume REAL)");
       }
 
       @Override
       public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
-         Log.w("Example", "Upgrading database; this will drop and recreate the tables.");
-         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
-         onCreate(db);
+    	 // NO REASON TO UPGRADE DATABASE FROM INITIAL VERSION
       }
    }
 }

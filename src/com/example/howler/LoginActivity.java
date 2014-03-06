@@ -75,6 +75,8 @@ public class LoginActivity extends Activity implements OnClickListener {
 		super.onCreate(savedInstanceState);
 		
 		Log.d(TAG, "On Create");
+		
+		dh = new DatabaseHelper(this.getApplicationContext());
 
 		
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -132,8 +134,11 @@ public class LoginActivity extends Activity implements OnClickListener {
 		  @Override
 		  public void onRequestSuccess(User user) {
 		    //update your UI
-			  if (user != null)
-			  Log.d(TAG, "user.class = " + user.getClass() + " + user.message = " + user.getMessage());
+			  if (user != null && user.getAuthtoken().length() > 0) {
+				  // successful login
+				  //dh.
+			  }
+				  
 		  }
 		}
 
