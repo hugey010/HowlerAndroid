@@ -5,6 +5,9 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class User {
 	
+	private static final int MIN_INPUT_LENGTH = 3;
+	private static final int MAX_INPUT_LENGTH = 40;
+	
 	private String username;
 	private String identifier;
 	private String password;
@@ -16,7 +19,16 @@ public class User {
 	private String message;
 	
 	public boolean validLogin() {
-		return username.length() > 3 && password.length() > 3;
+		return username.length() > MIN_INPUT_LENGTH && 
+				username.length() < MAX_INPUT_LENGTH &&
+				password.length() > MIN_INPUT_LENGTH &&
+				password.length() < MAX_INPUT_LENGTH;
+	}
+	
+	public boolean validRegistration() {
+		return validLogin() &&
+				email.length() > MIN_INPUT_LENGTH &&
+				email.length() < MAX_INPUT_LENGTH;
 	}
 	
 	public String getUsername() {

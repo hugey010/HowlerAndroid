@@ -29,11 +29,9 @@ public class LoginActivity extends Activity implements OnClickListener {
 	
 	protected SpiceManager spiceManager = new SpiceManager(JsonSpiceService.class);
 	
-	
 	private DatabaseHelper dh;
 	private EditText userNameEditableField;
 	private EditText passwordEditableField;
-	private final static String OPT_NAME = "name";
 	private final static String TAG = "LoginActivity Lifecycle logs";
 
 	@Override
@@ -125,38 +123,40 @@ public class LoginActivity extends Activity implements OnClickListener {
 	
 	private class LoginRegisterRequestListener implements RequestListener<User> {
 
-		  @Override
-		  public void onRequestFailure(SpiceException e) {
-		    //update your UI
-			  Log.d(TAG, e.getMessage());
-		  }
+	  @Override
+	  public void onRequestFailure(SpiceException e) {
+	    //update your UI
+		  Log.d(TAG, e.getMessage());
+	  }
 
-		  @Override
-		  public void onRequestSuccess(User user) {
-		    //update your UI
-			  if (user != null && user.getAuthtoken() != null && user.getAuthtoken().length() > 0) {
-				  // successful login
-				  //dh.
-				  Intent intent = new Intent(LoginActivity.this, RecorderActivity.class);
-				  LoginActivity.this.startActivity(intent);
-			  } else {
-				  String message = "Invalid Fields";
-				  if (user.getMessage() != null) {
-					  message = user.getMessage();
-				  }
-					new AlertDialog.Builder(LoginActivity.this)
-					.setTitle("Login Failed")
-					.setMessage(message)
-					.setNeutralButton("Try Again",
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog,
-										int which) {
-								}
-							}).show();
+	  @Override
+	  public void onRequestSuccess(User user) {
+	    //update your UI
+		  if (user != null && user.getAuthtoken() != null && user.getAuthtoken().length() > 0) {
+			  // successful login
+			  //dh.
+			  Intent intent = new Intent(LoginActivity.this, RecorderActivity.class);
+			  LoginActivity.this.startActivity(intent);
+			  finish();
+			  
+		  } else {
+			  String message = "Invalid Fields";
+			  if (user.getMessage() != null) {
+				  message = user.getMessage();
 			  }
-				  
+				new AlertDialog.Builder(LoginActivity.this)
+				.setTitle("Login Failed")
+				.setMessage(message)
+				.setNeutralButton("Try Again",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int which) {
+							}
+						}).show();
 		  }
-		}
+			  
+	  }
+	}
 
 	public void onClick(View v) {
 		switch (v.getId()) {

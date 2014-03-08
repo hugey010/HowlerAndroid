@@ -13,6 +13,7 @@
     <string name="cancel">Cancel</string>
     <string name="done">Done</string>
     <string name="confirm_password_text">Confirm Password</string>
+    <string name="email_text">Email Address</string>
     <string name="title_activity_database_helper">DatabaseHelper</string>
     <string name="title_activity_splash_screen">SplashScreen</string>
     <string name="friends">Friends</string>
