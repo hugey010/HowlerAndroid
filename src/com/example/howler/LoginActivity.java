@@ -75,7 +75,14 @@ public class LoginActivity extends Activity implements OnClickListener {
 		Log.d(TAG, "On Create");
 		
 		dh = new DatabaseHelper(this.getApplicationContext());
-
+		
+		// check for already existing user. send to recorder if auth token
+		if (dh.authToken() != null) {
+			  Intent intent = new Intent(LoginActivity.this, RecorderActivity.class);
+			  LoginActivity.this.startActivity(intent);
+			  finish();
+			  return;
+		}
 		
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
@@ -134,7 +141,7 @@ public class LoginActivity extends Activity implements OnClickListener {
 	    //update your UI
 		  if (user != null && user.getAuthtoken() != null && user.getAuthtoken().length() > 0) {
 			  // successful login
-			  //dh.
+			  dh.setPersistentUser(user);
 			  Intent intent = new Intent(LoginActivity.this, RecorderActivity.class);
 			  LoginActivity.this.startActivity(intent);
 			  finish();

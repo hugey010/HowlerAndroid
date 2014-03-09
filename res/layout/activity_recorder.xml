@@ -116,5 +116,10 @@
 
         <requestFocus />
     </EditText>
+    
+	<FrameLayout
+    	android:id="@+id/friends_list_container"
+    	android:layout_width="240dp"
+    	android:layout_height="match_parent" />
 
 </RelativeLayout>

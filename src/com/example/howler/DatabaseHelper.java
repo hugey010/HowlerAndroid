@@ -1,5 +1,6 @@
 package com.example.howler;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -8,6 +9,8 @@ import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.example.howler.WebRequest.User;
 
 /**
  * Use this class to perform database actions based on web requests.
@@ -26,6 +29,32 @@ public class DatabaseHelper {
       this.context = context;
       HowlerDatabaseHelper openHelper = new HowlerDatabaseHelper(this.context);
       this.db = openHelper.getWritableDatabase();
+   }
+   
+   public String authToken() {
+	   Cursor c = db.rawQuery("SELECT authtoken FROM users", null);
+	   c.moveToFirst();
+	   try {
+		   	Log.d(TAG, "stored auth token = " + c.getString(0));
+		   	String authtoken = c.getString(0);
+	   		return authtoken;
+
+	   } catch (Exception e) {
+		   return null;
+	   }
+   }
+   
+   public void setPersistentUser(User user) {
+	   clearPesistentUser();
+	   ContentValues contentValues = new ContentValues();
+	   contentValues.put("identifier", user.getIdentifier());
+	   contentValues.put("username", user.getUsername());
+	   contentValues.put("authtoken", user.getAuthtoken());
+	   this.db.insert("users", null, contentValues);
+   }
+   
+   public void clearPesistentUser() {
+	   this.db.execSQL("DELETE FROM users");
    }
 
    /*
@@ -68,7 +97,8 @@ public class DatabaseHelper {
     	  // first database creation
     	  // create all tables
     	  db.execSQL("CREATE TABLE users (identifier INTEGER PRIMARY KEY, username TEXT, authtoken TEXT, email TEXT)");
-    	  //db.execSQL("CREATE TABLE messages (identifier INTEGER PRIMARY KEY, user_id INTEGER, timestamp TEXT, data BLOB, title TEXT, volume REAL)");
+    	  db.execSQL("CREATE TABLE messages (identifier INTEGER PRIMARY KEY, user_id INTEGER, timestamp TEXT, data BLOB, title TEXT, volume REAL)");
+    	  db.execSQL("CREATE TABLE friends (identifier INTEGER PRIMARY KEY, username TEXT, pending INTEGER)");
       }
 
       @Override
