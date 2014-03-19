@@ -50,7 +50,8 @@
         android:layout_above="@+id/audio_position"
         android:layout_alignLeft="@+id/enter_title"
         android:layout_marginBottom="24dp"
-        android:text="@string/play" />
+        android:text="@string/play"
+        android:clickable="false"/>
 
     <Button
         android:id="@+id/delete_button"
@@ -59,7 +60,8 @@
         android:layout_alignBaseline="@+id/play_button"
         android:layout_alignBottom="@+id/play_button"
         android:layout_alignRight="@+id/enter_title"
-        android:text="@string/delete" />
+        android:text="@string/delete"
+        android:clickable="false"/>
 
     <TextView
         android:id="@+id/audio_pos_text"
@@ -102,6 +104,7 @@
         android:layout_marginBottom="15dp"
         android:padding="5dp"
         android:src="@drawable/record_button" />
+    
 
     <EditText
         android:id="@+id/enter_title"
