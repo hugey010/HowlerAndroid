@@ -1,5 +1,6 @@
 package com.example.howler;
 
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Button;
 import android.widget.Toast;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -75,6 +77,8 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
         	voiceRecorder.prepare();
         	voiceRecorder.start();
         	title = null;
+    		btnPlay.setBackgroundColor(Color.RED);
+    		btnDelete.setBackgroundColor(Color.RED);
         } catch(IOException e){
         	e.printStackTrace();
         }
@@ -87,6 +91,8 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
 		voiceRecorder = null;
 		btnPlay.setClickable(true);
 		btnDelete.setClickable(true);
+		btnPlay.setBackgroundColor(Color.GREEN);
+		btnDelete.setBackgroundColor(Color.GREEN);
 		btnRecord.setClickable(false);
 	}
 	
