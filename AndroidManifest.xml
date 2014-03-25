@@ -53,11 +53,13 @@
 
         <activity
             android:name="com.example.howler.FriendsList"
-            android:label="@string/title_activity_friends_list" >
+            android:label="@string/title_activity_friends_list"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="com.example.howler.MessagesList"
-            android:label="@string/title_activity_messages_list" >
+            android:label="@string/title_activity_messages_list"
+            android:screenOrientation="portrait" >
         </activity>
     </application>
 
