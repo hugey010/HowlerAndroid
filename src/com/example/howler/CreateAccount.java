@@ -124,7 +124,8 @@ public class CreateAccount extends Activity implements OnClickListener {
 							public void onClick(DialogInterface dialog,
 									int which) {
 							}
-						}).show();		  }
+						}).show();	
+				}
 
 		  @SuppressLint("InlinedApi")
 		@Override

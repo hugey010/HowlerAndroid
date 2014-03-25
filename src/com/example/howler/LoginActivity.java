@@ -1,7 +1,5 @@
 package com.example.howler;
 
-import java.util.List;
-
 import com.example.howler.WebRequest.JsonSpiceService;
 import com.example.howler.WebRequest.LoginRegisterRequest;
 import com.example.howler.WebRequest.User;
@@ -14,9 +12,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
