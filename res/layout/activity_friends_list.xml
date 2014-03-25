@@ -41,6 +41,51 @@
             android:layout_weight="1"
 	        android:textColor="#ffffff"            
             android:text="Back" />
-    </LinearLayout>    
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/header"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_centerHorizontal="true" >
+
+	    <EditText
+	        android:id="@+id/friendsearch_edittext"
+	        android:layout_width="wrap_content"
+	        android:layout_height="match_parent"
+	        android:layout_alignBottom="@+id/addfriend_imagebutton"
+	        android:layout_alignParentLeft="true"
+	        android:layout_toLeftOf="@+id/addfriend_imagebutton"
+	        android:ems="10"
+	        android:hint="Search for friends"
+	        android:inputType="text" >
+
+	        <requestFocus />
+	    </EditText>
+
+	    <ImageButton
+	        android:id="@+id/addfriend_imagebutton"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_marginLeft="10dp"
+	        android:layout_alignParentRight="true"
+	        android:layout_alignParentTop="true"
+	        android:background="#ffffff"
+	        android:src="@drawable/add50inactive" />
+
+	    <Button
+	        android:id="@+id/send_button"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentBottom="true"
+	        android:layout_centerHorizontal="true"
+	        android:layout_marginBottom="14dp"
+	        android:text="Send" />
+	    
+	</RelativeLayout>
+	    
 
 </RelativeLayout>
