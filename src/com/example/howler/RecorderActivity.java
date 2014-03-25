@@ -1,12 +1,12 @@
 package com.example.howler;
 
-import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.View;
@@ -17,7 +17,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Button;
 import android.widget.Toast;
-
 import java.io.File;
 import java.io.IOException;
 
@@ -31,6 +30,8 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
 	private View btnPlay;
 	private View btnRecord;
 	private View btnDelete;
+	private View btnFriendsList;
+	private View btnMessagesList;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -40,22 +41,26 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
 		setContentView(R.layout.activity_recorder);
 		btnRecord = (ImageButton) findViewById(R.id.record_button);
 		btnRecord.setOnClickListener(this);
+		btnFriendsList = (Button) findViewById(R.id.friends_button);
+		btnFriendsList.setOnClickListener(this);
+		btnMessagesList = (Button) findViewById(R.id.message_list_button);
+		btnMessagesList.setOnClickListener(this);
 		btnPlay = (Button) findViewById(R.id.play_button);
 		btnPlay.setOnClickListener(this);
 		btnDelete = (Button) findViewById(R.id.delete_button);
 		btnDelete.setOnClickListener(this);
 		titleEditableField = (EditText) findViewById(R.id.enter_title);
 		// setup friends and messages fragments
-		if (findViewById(R.id.friends_list_container) != null) {
-            if (savedInstanceState != null) {
-                return;
-            }
-
-            FriendsListFragment friendFragment = new FriendsListFragment();
-            friendFragment.setArguments(getIntent().getExtras());
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.friends_list_container, friendFragment).commit();
-		}
+//		if (findViewById(R.id.friends_list_container) != null) {
+//            if (savedInstanceState != null) {
+//                return;
+//            }
+//
+//            FriendsListFragment friendFragment = new FriendsListFragment();
+//            friendFragment.setArguments(getIntent().getExtras());
+//            getSupportFragmentManager().beginTransaction()
+//                    .add(R.id.friends_list_container, friendFragment).commit();
+//		}
 		
 	}
 	@Override
@@ -77,8 +82,6 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
         	voiceRecorder.prepare();
         	voiceRecorder.start();
         	title = null;
-    		btnPlay.setBackgroundColor(Color.RED);
-    		btnDelete.setBackgroundColor(Color.RED);
         } catch(IOException e){
         	e.printStackTrace();
         }
@@ -91,8 +94,6 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
 		voiceRecorder = null;
 		btnPlay.setClickable(true);
 		btnDelete.setClickable(true);
-		btnPlay.setBackgroundColor(Color.GREEN);
-		btnDelete.setBackgroundColor(Color.GREEN);
 		btnRecord.setClickable(false);
 	}
 	
@@ -116,11 +117,12 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.friends_button:
-			
+    		Intent i = new Intent(getApplicationContext(), com.example.howler.FriendsList.class);
+    		startActivity(i);				
 			break;
 		case R.id.message_list_button:
-			
-			
+    		Intent i2 = new Intent(getApplicationContext(), com.example.howler.MessagesList.class);
+    		startActivity(i2);			
 			break;
 	    case R.id.record_button:
 	    	isRecording = !isRecording;

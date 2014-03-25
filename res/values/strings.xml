@@ -24,5 +24,7 @@
     <string name="delete">Delete</string>
     <string name="set_recip_vol">Set Recipient Volume</string>
     <string name="set_audio_pos">Set Audio Position</string>
+    <string name="title_activity_friends_list">FriendsList</string>
+    <string name="title_activity_messages_list">MessagesList</string>
 
 </resources>
