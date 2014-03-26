@@ -6,7 +6,7 @@ public class MessageListObject {
 
 	private List<Message> messages;
 	private boolean success;
-
+	
 	public List<Message> getMessages() {
 		return messages;
 	}

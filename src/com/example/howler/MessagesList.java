@@ -44,8 +44,8 @@ public class MessagesList extends Activity {
 	
 	@Override
 	public void onStop() {
-		super.onStop();
 		spiceManager.shouldStop();
+		super.onStop();
 	}
 	
 	@Override
@@ -81,8 +81,8 @@ public class MessagesList extends Activity {
 		// send request
 		MessagesList.this.setProgressBarIndeterminateVisibility(true);
 		MessageListObject messageList = new MessageListObject();
-		MessagesListRequest request = new MessagesListRequest(messageList);
-		spiceManager.execute(request, new MessageListRequestListener());
+		MessagesListRequest request = new MessagesListRequest();
+		//spiceManager.execute(request, new MessageListRequestListener());
 		spiceManager.execute(request, messageList, DurationInMillis.ALWAYS_EXPIRED, new MessageListRequestListener());
 	
 	}
@@ -127,7 +127,7 @@ public class MessagesList extends Activity {
 
 		@Override
 		public void onRequestFailure(SpiceException exception) {
-			Log.e(TAG, "failure" + exception.toString());
+			Log.e(TAG, "failure" + exception.getMessage());
 			
 			
 		}
@@ -136,9 +136,7 @@ public class MessagesList extends Activity {
 		public void onRequestSuccess(MessageListObject messages) {
 			
 			
-			Log.d(TAG, "success, number of messages: " + messages.getMessages().size());
-
-			
+			Log.d(TAG, "success, number of messages: " + messages.getMessages().size() + " msss: " + messages.getMessages());			
 		}
 		
 	}

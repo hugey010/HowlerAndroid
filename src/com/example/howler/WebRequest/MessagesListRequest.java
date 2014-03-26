@@ -20,20 +20,23 @@ import com.octo.android.robospice.request.springandroid.SpringAndroidSpiceReques
 public class MessagesListRequest extends SpringAndroidSpiceRequest<MessageListObject> {
 
 	private static final String TAG = "Messages List Request";
-	private MessageListObject messageList;
 	
-	public MessagesListRequest(MessageListObject messageList) {
+	public MessagesListRequest() {
 		super(MessageListObject.class);
-		this.messageList = messageList;
 	}
 	
 	@Override
 	public MessageListObject loadDataFromNetwork() throws Exception {
 		String url = JsonSpiceService.baseURL + "messages";
 		
-		MappingJacksonHttpMessageConverter converter = new MappingJacksonHttpMessageConverter();
-		//converter.getObjectMapper().configure(Feature.UNWRAP_ROOT_VALUE, true);
 		
+		//MappingJacksonHttpMessageConverter converter = new MappingJacksonHttpMessageConverter();
+		//converter.getObjectMapper().configure(Feature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true);
+		//converter.getObjectMapper().configure(Feature.UNWRAP_ROOT_VALUE, true);
+		/*
+		converter.getObjectMapper().configure(Feature.AUTO_DETECT_SETTERS, true);
+		converter.getObjectMapper().configure(Feature.AUTO_DETECT_FIELDS, true);
+		*/
 				
 		ClientHttpRequestFactory fac = new HttpComponentsClientHttpRequestFactory() {
 
@@ -56,8 +59,10 @@ public class MessagesListRequest extends SpringAndroidSpiceRequest<MessageListOb
 		    }
 		};
 		
-		RestTemplate restTemplate = new RestTemplate(fac);
-		restTemplate.getMessageConverters().add(converter);
+		RestTemplate restTemplate = getRestTemplate();
+		restTemplate.setRequestFactory(fac);
+		//restTemplate.getMessageConverters().add(converter);
+		//restTemplate.getMessageConverters().add(converter);
 		return restTemplate.getForObject(url, MessageListObject.class);
 		//restTemplate.set
 		

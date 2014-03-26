@@ -38,9 +38,9 @@ public class LoginActivity extends Activity implements OnClickListener {
 	
 	@Override
 	public void onStop() {
-		super.onStop();
-		 spiceManager.shouldStop();
+		spiceManager.shouldStop();
 		Log.d(TAG, "On Stop");
+		super.onStop();
 	}
 	
 	// bs lifecycle methods

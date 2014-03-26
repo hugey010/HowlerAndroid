@@ -43,8 +43,8 @@ public class CreateAccount extends Activity implements OnClickListener {
 	
 	@Override
 	public void onStop() {
+		spiceManager.shouldStop();
 		super.onStop();
-		 spiceManager.shouldStop();
 	}
 	
 	public void onCreate(Bundle savedInstanceState) {
