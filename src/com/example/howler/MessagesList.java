@@ -5,6 +5,7 @@ import com.example.howler.WebRequest.MessageDataRequest;
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -12,6 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.util.support.Base64;
 import org.springframework.web.client.HttpClientErrorException;
 
 import com.example.howler.WebRequest.Message;
@@ -25,6 +27,9 @@ import com.example.howler.WebRequest.JsonSpiceService;
 
 
 
+import android.media.AudioFormat;
+import android.media.AudioManager;
+import android.media.AudioTrack;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -189,30 +194,79 @@ public class MessagesList extends Activity {
 		
 	}
 	
+	private void PlayShortAudioFileViaAudioTrack(String filePath) throws IOException
+	{
+		// We keep temporarily filePath globally as we have only two sample sounds now..
+		if (filePath==null)
+			return;
+	
+		//Reading the file..
+		byte[] byteData = null; 
+		File file = null; 
+		file = new File(filePath); // for ex. path= "/sdcard/samplesound.pcm" or "/sdcard/samplesound.wav"
+		byteData = new byte[(int) file.length()];
+		FileInputStream in = null;
+		try {
+			in = new FileInputStream( file );
+			in.read( byteData );
+			in.close(); 
+	
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		// Set and push to audio track..
+		int intSize = android.media.AudioTrack.getMinBufferSize(8000, AudioFormat.CHANNEL_IN_STEREO,
+		AudioFormat.ENCODING_PCM_16BIT); 
+		AudioTrack at = new AudioTrack(AudioManager.STREAM_MUSIC, 8000, AudioFormat.CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_16BIT, intSize, AudioTrack.MODE_STREAM);
+		if (at!=null) { 
+			at.play();
+			// Write the byte array to the track
+			at.write(byteData, 0, byteData.length); 
+			at.stop();
+			at.release();
+		}
+
+	}
+	
 	private void playAudio(byte[] soundArray) {
 	    try {
 	        // create temp file that will hold byte array
-	        File temp = File.createTempFile("temp", "wave", getCacheDir());
+	    	//byte[] decoded = Base64.decode(soundArray);
+	    	
+	    	File outputDir = this.getApplicationContext().getExternalCacheDir();
+	    	File temp = File.createTempFile("temporary", ".pcm", outputDir);
 	        String path = temp.getAbsolutePath();
-	        
-	        temp.deleteOnExit();
-	        FileOutputStream fos = new FileOutputStream(temp);
-	        fos.write(soundArray);
-	        fos.close();
- 
-	        MediaPlayer mediaPlayer = new MediaPlayer();
-	        FileInputStream fis = new FileInputStream(temp);
-	        
-	        Log.v(TAG, "playing audio wuut: " + path);
 
-	        mediaPlayer.setDataSource(fis.getFD());
+	    	FileOutputStream fos = new FileOutputStream(path);
+	    	fos.write(soundArray);
+	    	fos.close();
+
+
+	        Log.v(TAG, "playing audio wuut: " + path);
+	        PlayShortAudioFileViaAudioTrack(path);	        
+	    	
+	        
+	        //temp.deleteOnExit();
+	        //FileOutputStream fos = new FileOutputStream(temp);
+	        //fos.write(soundArray);
+	        //fos.close();
+	        /*
+	        MediaPlayer mediaPlayer = new MediaPlayer();
+	        //FileInputStream fis = new FileInputStream(temp);
+	        
+	        Uri uri = Uri.fromFile(temp);
+
+
+	        mediaPlayer.setDataSource(getApplicationContext(), uri);
 
 	        mediaPlayer.prepare();
 	        mediaPlayer.start();
+	        */
 	    } catch (IOException ex) {
 	        String s = ex.toString();
 	        ex.printStackTrace();
 	    }
+	    
 	}
 	
 	private class MessageListRequestListener implements RequestListener<Message.List> {
