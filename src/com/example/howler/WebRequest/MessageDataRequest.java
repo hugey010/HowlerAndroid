@@ -4,13 +4,11 @@ import java.io.IOException;
 import java.net.URI;
 
 import org.apache.http.client.methods.HttpUriRequest;
-import org.codehaus.jackson.map.DeserializationConfig.Feature;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
 import android.util.Log;
@@ -18,20 +16,22 @@ import android.util.Log;
 import com.example.howler.DatabaseHelper;
 import com.octo.android.robospice.request.springandroid.SpringAndroidSpiceRequest;
 
-public class MessagesListRequest extends SpringAndroidSpiceRequest<Message.List> {
-
-	private static final String TAG = "Messages List Request";
+public class MessageDataRequest extends SpringAndroidSpiceRequest<MessageDownload> {
+	
 	private DatabaseHelper db;
+	private String messageId;
+	private static final String TAG = "MessageDataRequest";
 	
-	public MessagesListRequest(DatabaseHelper database) {
-		super(Message.List.class);
-		this.db = database;
+	public MessageDataRequest(DatabaseHelper database, String message_id) {
+		super(MessageDownload.class);
+		db = database;
+		messageId = message_id;
 	}
-	
+
 	@Override
-	public Message.List loadDataFromNetwork() throws Exception {
-		String url = JsonSpiceService.baseURL + "messages";
-	
+	public MessageDownload loadDataFromNetwork() throws Exception {
+		String url = JsonSpiceService.baseURL + "message" + "?message_id=" + messageId;
+		
 		ClientHttpRequestFactory fac = new HttpComponentsClientHttpRequestFactory() {
 
 		    @Override
@@ -51,13 +51,11 @@ public class MessagesListRequest extends SpringAndroidSpiceRequest<Message.List>
 		            Log.d(TAG, uri.toString());
 		        return super.createRequest(uri, httpMethod);
 		    }
-		};
+		};		
 		
 		RestTemplate restTemplate = getRestTemplate();
 		restTemplate.setRequestFactory(fac);
-		return restTemplate.getForObject(url, Message.List.class);	
+		return restTemplate.getForObject(url, MessageDownload.class);			
 	}
-	
-
 
 }

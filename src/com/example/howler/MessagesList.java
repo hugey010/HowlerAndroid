@@ -1,12 +1,19 @@
 package com.example.howler;
 
+import com.example.howler.WebRequest.MessageDataRequest;
 
 import java.io.File;
-import java.io.FilenameFilter;
-import java.util.Arrays;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
+
 import com.example.howler.WebRequest.Message;
+import com.example.howler.WebRequest.MessageDownload;
 import com.example.howler.WebRequest.MessagesListRequest;
 import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.exception.SpiceException;
@@ -15,10 +22,11 @@ import com.example.howler.WebRequest.JsonSpiceService;
 
 
 
+import android.media.AudioFormat;
+import android.media.AudioManager;
+import android.media.AudioTrack;
 import android.os.Bundle;
-import android.os.Environment;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.util.Log;
 import android.view.Menu;
@@ -32,7 +40,6 @@ import android.widget.Toast;
 public class MessagesList extends Activity {
 
 	
-	private List<String> messageList;
 	private LinearLayout main;
 	private DatabaseHelper dh;
 
@@ -60,8 +67,7 @@ public class MessagesList extends Activity {
 		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);		
 		setContentView(R.layout.activity_messages_list);
-		this.PopulateMessageList();
-		this.DisplayMessageList();
+		this.DisplayInitialMessageList();
 		//get the message button and make it not pressable
 		Button messageButton = (Button) findViewById(R.id.message_list_button);
 		messageButton.setEnabled(false);	
@@ -80,11 +86,11 @@ public class MessagesList extends Activity {
 		
 		// send request
 		MessagesList.this.setProgressBarIndeterminateVisibility(true);
-		MessagesListRequest request = new MessagesListRequest(dh.authToken());
+		MessagesListRequest request = new MessagesListRequest(dh);
 		spiceManager.execute(request, new MessageListRequestListener());
-		//spiceManager.execute(request, Message.List, DurationInMillis.ALWAYS_EXPIRED, new MessageListRequestListener());
 	
 	}
+	/*
 	public void PopulateMessageList(){
 		File audioPath = new File(Environment.getDataDirectory().getAbsolutePath() + "/data/com.example.howler/");
 		messageList = Arrays.asList(audioPath.list(
@@ -96,9 +102,14 @@ public class MessagesList extends Activity {
 			));
 		Toast.makeText(MessagesList.this, "Messages that exist:  " + messageList, Toast.LENGTH_LONG).show();
 	}
-	public void DisplayMessageList(){
+	*/
+	public void DisplayInitialMessageList() {
+		
+	}
+	
+	public void DisplayMessageList(List<Message> messagesList){
 		main =(LinearLayout) findViewById(R.id.messages);
-		for(final String message : messageList){
+		for(final Message m : messagesList){
 			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 			LinearLayout layout = new LinearLayout(getApplicationContext());
 			LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -106,26 +117,30 @@ public class MessagesList extends Activity {
 			layout.setLayoutParams(params);
 			Button btnMessage = new Button(getApplicationContext());
 			btnMessage.setLayoutParams(buttonParams);
-			btnMessage.setText(message);
+			btnMessage.setText(m.getTitle());
 			btnMessage.setOnClickListener(new View.OnClickListener() {
 				
 				@Override
 				public void onClick(View v) {
-					playBack(message);
+					playBack(m);
 				}
 			});
 			layout.addView(btnMessage);
 			main.addView(layout);		
 		}	
 	}
-	public void playBack(String message){
-		Toast.makeText(MessagesList.this, "message trying to play is:" + message, Toast.LENGTH_LONG).show();
+	
+	public void playBack(Message m){
+		Toast.makeText(MessagesList.this, "message trying to play is:" + m.getUsername() + m.getMessage_id(), Toast.LENGTH_LONG).show();
 		//AlertDialog.Builder builder = new AlertDialog.Builder(getApplication());
 		//builder.setMessage("MESSAGE:" + message)
 		//		.setTitle("TITLE");
 		//AlertDialog dialog = builder.create();
 		//dialog.show();
-		
+		MessagesList.this.setProgressBarIndeterminateVisibility(true);
+		MessageDataRequest request = new MessageDataRequest(dh, m.getMessage_id());
+		spiceManager.execute(request, new MessageDownloadRequestListener());
+	
 			
 	}
 	@Override
@@ -136,21 +151,106 @@ public class MessagesList extends Activity {
 		return true;
 	}
 	
+	private class MessageDownloadRequestListener implements RequestListener<MessageDownload> {
+		
+		@Override
+		public void onRequestFailure(SpiceException exception) {
+			Log.e(TAG, "message download failure" + exception.getMessage());
+
+			// detect invalid auth
+			if (exception.getCause() instanceof HttpClientErrorException) {
+				HttpClientErrorException e = (HttpClientErrorException)exception.getCause();
+				if (e.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
+					dh.clearPesistentUser();
+					Intent intent = new Intent(MessagesList.this, LoginActivity.class);
+					MessagesList.this.startActivity(intent);
+					finish();
+				}
+			}
+		}
+
+		@Override
+		public void onRequestSuccess(MessageDownload download) {
+
+			Log.d(TAG, "success messages data length: " + download.getData().length);	
+			playAudio(download.getData());
+			
+		}
+		
+	}
+	
+	private void PlayShortAudioFileViaAudioTrack(String filePath) throws IOException
+	{
+		if (filePath==null)
+			return;
+	
+		//Reading the file..
+		byte[] byteData = null; 
+		File file = new File(filePath);
+		byteData = new byte[(int) file.length()];
+		FileInputStream in = null;
+		try {
+			in = new FileInputStream( file );
+			in.read( byteData );
+			in.close(); 
+	
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		// Set and push to audio track..
+		int intSize = android.media.AudioTrack.getMinBufferSize(8000, AudioFormat.CHANNEL_IN_STEREO,
+		AudioFormat.ENCODING_PCM_16BIT); 
+		AudioTrack at = new AudioTrack(AudioManager.STREAM_MUSIC, 8000, AudioFormat.CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_16BIT, intSize, AudioTrack.MODE_STREAM);
+		if (at!=null) { 
+			at.play();
+			// Write the byte array to the track
+			at.write(byteData, 0, byteData.length); 
+			at.stop();
+			at.release();
+		}
+
+	}
+	
+	private void playAudio(byte[] soundArray) {
+	    try {
+
+	    	File outputDir = this.getApplicationContext().getExternalCacheDir();
+	    	File temp = File.createTempFile("temporary", ".pcm", outputDir);
+	        String path = temp.getAbsolutePath();
+
+	    	FileOutputStream fos = new FileOutputStream(path);
+	    	fos.write(soundArray);
+	    	fos.close();
+
+	        PlayShortAudioFileViaAudioTrack(path);	        
+	    	
+	    } catch (IOException ex) {
+	        ex.printStackTrace();
+	    }
+	    
+	}
+	
 	private class MessageListRequestListener implements RequestListener<Message.List> {
 
 		@Override
 		public void onRequestFailure(SpiceException exception) {
-			Log.e(TAG, "failure" + exception.getMessage());
-			
-			
+			Log.e(TAG, "message list failure" + exception.getMessage());
+			// detect invalid auth
+			if (exception.getCause() instanceof HttpClientErrorException) {
+				HttpClientErrorException e = (HttpClientErrorException)exception.getCause();
+				if (e.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
+					dh.clearPesistentUser();
+					Intent intent = new Intent(MessagesList.this, LoginActivity.class);
+					MessagesList.this.startActivity(intent);
+					finish();
+				}
+			}
 		}
 
 		@Override
 		public void onRequestSuccess(Message.List messages) {
-			
-			
-			Log.d(TAG, "success, number of messages: " + messages.getMessages().size() + " msss: " + messages.getMessages().get(0).getTitle());	
-			
+			DisplayMessageList(messages.getMessages());
+			Log.d(TAG, "success, number of messages: " + messages.getMessages().size());	
 		}
 		
 	}
