@@ -3,21 +3,16 @@ package com.example.howler;
 import com.example.howler.WebRequest.MessageDataRequest;
 
 import java.io.File;
-import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.util.support.Base64;
 import org.springframework.web.client.HttpClientErrorException;
 
 import com.example.howler.WebRequest.Message;
-import com.example.howler.WebRequest.MessageDataRequest;
 import com.example.howler.WebRequest.MessageDownload;
 import com.example.howler.WebRequest.MessagesListRequest;
 import com.octo.android.robospice.SpiceManager;
@@ -30,19 +25,9 @@ import com.example.howler.WebRequest.JsonSpiceService;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.DownloadManager;
-import android.app.DownloadManager.Query;
-import android.app.DownloadManager.Request;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -196,14 +181,12 @@ public class MessagesList extends Activity {
 	
 	private void PlayShortAudioFileViaAudioTrack(String filePath) throws IOException
 	{
-		// We keep temporarily filePath globally as we have only two sample sounds now..
 		if (filePath==null)
 			return;
 	
 		//Reading the file..
 		byte[] byteData = null; 
-		File file = null; 
-		file = new File(filePath); // for ex. path= "/sdcard/samplesound.pcm" or "/sdcard/samplesound.wav"
+		File file = new File(filePath);
 		byteData = new byte[(int) file.length()];
 		FileInputStream in = null;
 		try {
@@ -230,9 +213,7 @@ public class MessagesList extends Activity {
 	
 	private void playAudio(byte[] soundArray) {
 	    try {
-	        // create temp file that will hold byte array
-	    	//byte[] decoded = Base64.decode(soundArray);
-	    	
+
 	    	File outputDir = this.getApplicationContext().getExternalCacheDir();
 	    	File temp = File.createTempFile("temporary", ".pcm", outputDir);
 	        String path = temp.getAbsolutePath();
@@ -241,27 +222,8 @@ public class MessagesList extends Activity {
 	    	fos.write(soundArray);
 	    	fos.close();
 
-
-	        Log.v(TAG, "playing audio wuut: " + path);
 	        PlayShortAudioFileViaAudioTrack(path);	        
 	    	
-	        
-	        //temp.deleteOnExit();
-	        //FileOutputStream fos = new FileOutputStream(temp);
-	        //fos.write(soundArray);
-	        //fos.close();
-	        /*
-	        MediaPlayer mediaPlayer = new MediaPlayer();
-	        //FileInputStream fis = new FileInputStream(temp);
-	        
-	        Uri uri = Uri.fromFile(temp);
-
-
-	        mediaPlayer.setDataSource(getApplicationContext(), uri);
-
-	        mediaPlayer.prepare();
-	        mediaPlayer.start();
-	        */
 	    } catch (IOException ex) {
 	        String s = ex.toString();
 	        ex.printStackTrace();
