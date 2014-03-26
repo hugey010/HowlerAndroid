@@ -15,18 +15,18 @@ import android.util.Log;
 
 import com.octo.android.robospice.request.springandroid.SpringAndroidSpiceRequest;
 
-public class FriendsListRequest extends SpringAndroidSpiceRequest<FriendListObject> {
+public class FriendsListRequest extends SpringAndroidSpiceRequest<Friend.List> {
 
 	private static final String TAG = "Friends List Request";
 	private String auth_token;
 	
 	public FriendsListRequest(String auth_token) {
-		super(FriendListObject.class);
+		super(Friend.List.class);
 		this.auth_token = auth_token;
 	}
 
 	@Override
-	public FriendListObject loadDataFromNetwork() throws Exception {
+	public Friend.List loadDataFromNetwork() throws Exception {
 		String url = JsonSpiceService.baseURL + "friends";
 
 		ClientHttpRequestFactory fac = new HttpComponentsClientHttpRequestFactory() {
@@ -52,6 +52,6 @@ public class FriendsListRequest extends SpringAndroidSpiceRequest<FriendListObje
 
 		RestTemplate restTemplate = getRestTemplate();
 		restTemplate.setRequestFactory(fac);
-		return restTemplate.getForObject(url, FriendListObject.class);
+		return restTemplate.getForObject(url, Friend.List.class);
 	}
 }

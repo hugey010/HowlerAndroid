@@ -20,6 +20,9 @@ import com.example.howler.WebRequest.User;
  *
  */
 public class DatabaseHelper {
+	
+	public static List<String> selectedFriends = new ArrayList<String>();
+	
 	private static final String TAG = "DatabaseHelper";
 	
    private Context context;

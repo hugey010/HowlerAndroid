@@ -7,7 +7,6 @@ import com.example.howler.WebRequest.AddFriendRequest;
 import com.example.howler.WebRequest.ConfirmFriendRequest;
 import com.example.howler.WebRequest.ErrorResponseObject;
 import com.example.howler.WebRequest.Friend;
-import com.example.howler.WebRequest.FriendListObject;
 import com.example.howler.WebRequest.FriendsListRequest;
 import com.example.howler.WebRequest.JsonSpiceService;
 import com.example.howler.WebRequest.Username;
@@ -151,14 +150,13 @@ public class FriendsList extends Activity {
 
 		// send request
 		FriendsList.this.setProgressBarIndeterminateVisibility(true);
-		FriendListObject friendList = new FriendListObject();
 		FriendsListRequest request = new FriendsListRequest(dh.authToken());
-		spiceManager.execute(request, friendList, DurationInMillis.ALWAYS_EXPIRED, new FriendsListRequestListener());
+		spiceManager.execute(request, new FriendsListRequestListener());
 
 
 	}
 
-	public void populateFriendList(FriendListObject friendList){
+	public void populateFriendList(Friend.List friendList){
 		friend_list = friendList.getFriends();
 	}
 
@@ -225,7 +223,7 @@ public class FriendsList extends Activity {
 		return true;
 	}
 
-	private class FriendsListRequestListener implements RequestListener<FriendListObject> {
+	private class FriendsListRequestListener implements RequestListener<Friend.List> {
 
 		@Override
 		public void onRequestFailure(SpiceException exception) {
@@ -234,8 +232,8 @@ public class FriendsList extends Activity {
 		}
 
 		@Override
-		public void onRequestSuccess(FriendListObject friends) {
-			Log.d(TAG, "success, number of messages: " + friends.getFriends().size() + " friends: " + friends.getFriends());
+		public void onRequestSuccess(Friend.List friends) {
+			Log.d(TAG, "success, number of friends: " + friends.getFriends().size() + " friends: " + friends.getFriends());
 
 			populateFriendList(friends);
 			displayFriends();
