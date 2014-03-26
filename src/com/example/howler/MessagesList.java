@@ -117,7 +117,7 @@ public class MessagesList extends Activity {
 			layout.setLayoutParams(params);
 			Button btnMessage = new Button(getApplicationContext());
 			btnMessage.setLayoutParams(buttonParams);
-			btnMessage.setText(m.getTitle());
+			btnMessage.setText(m.getTitle() + " From: " + m.getUsername());
 			btnMessage.setOnClickListener(new View.OnClickListener() {
 				
 				@Override
@@ -229,7 +229,7 @@ public class MessagesList extends Activity {
 	    
 	}
 	
-	private class MessageListRequestListener implements RequestListener<Message.List> {
+	private class MessageListRequestListener implements RequestListener<Message.MList> {
 
 		@Override
 		public void onRequestFailure(SpiceException exception) {
@@ -247,7 +247,7 @@ public class MessagesList extends Activity {
 		}
 
 		@Override
-		public void onRequestSuccess(Message.List messages) {
+		public void onRequestSuccess(Message.MList messages) {
 			DisplayMessageList(messages.getMessages());
 			Log.d(TAG, "success, number of messages: " + messages.getMessages().size());	
 		}

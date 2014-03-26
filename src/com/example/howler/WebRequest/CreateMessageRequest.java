@@ -4,13 +4,11 @@ import java.io.IOException;
 import java.net.URI;
 
 import org.apache.http.client.methods.HttpUriRequest;
-import org.codehaus.jackson.map.DeserializationConfig.Feature;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
 import android.util.Log;
@@ -18,20 +16,22 @@ import android.util.Log;
 import com.example.howler.DatabaseHelper;
 import com.octo.android.robospice.request.springandroid.SpringAndroidSpiceRequest;
 
-public class MessagesListRequest extends SpringAndroidSpiceRequest<Message.MList> {
-
-	private static final String TAG = "Messages List Request";
+public class CreateMessageRequest extends SpringAndroidSpiceRequest<Message> {
+	private static final String TAG = "MessageUploadRequest";
+	private Message message;
 	private DatabaseHelper db;
 	
-	public MessagesListRequest(DatabaseHelper database) {
-		super(Message.MList.class);
+	public CreateMessageRequest(DatabaseHelper database, Message message) {
+		super(Message.class);
+		this.message = message;
 		this.db = database;
+
 	}
-	
+
 	@Override
-	public Message.MList loadDataFromNetwork() throws Exception {
-		String url = JsonSpiceService.baseURL + "messages";
-	
+	public Message loadDataFromNetwork() throws Exception {
+		String url = JsonSpiceService.baseURL + "createMessage";
+		
 		ClientHttpRequestFactory fac = new HttpComponentsClientHttpRequestFactory() {
 
 		    @Override
@@ -54,10 +54,8 @@ public class MessagesListRequest extends SpringAndroidSpiceRequest<Message.MList
 		};
 		
 		RestTemplate restTemplate = getRestTemplate();
-		restTemplate.setRequestFactory(fac);
-		return restTemplate.getForObject(url, Message.MList.class);	
+		restTemplate.setRequestFactory(fac);	
+		return restTemplate.postForObject(url, this.message, Message.class);
 	}
-	
-
 
 }

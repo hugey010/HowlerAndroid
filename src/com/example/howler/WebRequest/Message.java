@@ -1,6 +1,7 @@
 package com.example.howler.WebRequest;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
@@ -10,12 +11,16 @@ public class Message {
 	
 	private String message_id;
 	private Boolean read;
-	private double timestamp;
+	private String timestamp;
 	private String title;
 	private String username;
 	private double volume;
 	
-	public static class List {
+	// for message creation and uploading
+	private byte[] data;
+	private List<String> usernames;
+	
+	public static class MList {
 		
 		private boolean success;
 		
@@ -55,10 +60,10 @@ public class Message {
 	public void setRead(Boolean read) {
 		this.read = read;
 	}
-	public double getTimestamp() {
+	public String getTimestamp() {
 		return timestamp;
 	}
-	public void setTimestamp(double timestamp) {
+	public void setTimestamp(String timestamp) {
 		this.timestamp = timestamp;
 	}
 	public String getTitle() {
@@ -78,6 +83,18 @@ public class Message {
 	}
 	public void setVolume(double volume) {
 		this.volume = volume;
+	}
+	public byte[] getData() {
+		return data;
+	}
+	public void setData(byte[] data) {
+		this.data = data;
+	}
+	public List<String> getUsernames() {
+		return usernames;
+	}
+	public void setUsernames(List<String> usernames) {
+		this.usernames = usernames;
 	}
 
 }

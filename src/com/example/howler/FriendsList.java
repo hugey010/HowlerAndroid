@@ -1,10 +1,14 @@
 package com.example.howler;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.example.howler.WebRequest.AddFriendRequest;
 import com.example.howler.WebRequest.ConfirmFriendRequest;
+import com.example.howler.WebRequest.CreateMessageRequest;
 import com.example.howler.WebRequest.ErrorResponseObject;
 import com.example.howler.WebRequest.Friend;
 import com.example.howler.WebRequest.FriendsListRequest;
@@ -16,6 +20,7 @@ import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 
 import android.os.Bundle;
+import android.os.Message;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
@@ -144,6 +149,26 @@ public class FriendsList extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO action for send button
+				
+				// check input fields
+				
+				com.example.howler.WebRequest.Message message = new com.example.howler.WebRequest.Message();
+				message.setTitle("testing title");
+				try {
+					RandomAccessFile f = new RandomAccessFile(RecorderActivity.filePath(), "r");
+					byte[] data = new byte[(int)f.length()];
+					f.read(data);
+					message.setData(data);
+					List<String> friends = new ArrayList<String>();
+					friends.add("hugey");
+					message.setUsernames(friends);
+			
+				} catch (Exception e) {
+					Log.v(TAG, "failed to upload multipart. could not read audio file");
+				}
+				//message.setData();
+				CreateMessageRequest request = new CreateMessageRequest(dh, message);
+				spiceManager.execute(request, message, DurationInMillis.ALWAYS_EXPIRED, new CreateMessageRequestListener());
 
 			}
 		});
@@ -154,6 +179,23 @@ public class FriendsList extends Activity {
 		spiceManager.execute(request, new FriendsListRequestListener());
 
 
+	}
+	
+	private class CreateMessageRequestListener implements RequestListener<com.example.howler.WebRequest.Message> {
+
+		@Override
+		public void onRequestFailure(SpiceException e) {
+			Log.v(TAG, e.getMessage());
+		}
+
+		@Override
+		public void onRequestSuccess(com.example.howler.WebRequest.Message message) {
+			// multipart upload of data
+			Log.v(TAG, "created message id: " + message.getMessage_id() + ", title: " + message.getTitle());
+			
+			
+		}
+		
 	}
 
 	public void populateFriendList(Friend.List friendList){

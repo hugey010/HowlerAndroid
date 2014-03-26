@@ -40,7 +40,7 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
 	
 	private EditText titleEditableField;
 	private AudioRecord voiceRecorder;
-	private String audioFile;
+	private static String audioFile;
 	private boolean isRecording = false;
 	private View btnPlay;
 	private View btnRecord;
@@ -50,7 +50,10 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
 	final Context context = this;
 	private Thread recordingThread = null;
 	private Thread playingThread = null;
-
+	
+	public static String filePath() {
+		return audioFile;
+	}
 	
 	private TextWatcher mTextWatcher = new TextWatcher() {
 		@Override
