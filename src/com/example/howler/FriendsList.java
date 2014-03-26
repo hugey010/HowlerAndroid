@@ -83,11 +83,18 @@ public class FriendsList extends Activity {
 		//get friend search edittext and listen for text
 		searchFriend = (EditText) findViewById(R.id.friendsearch_edittext);
 		searchFriend.addTextChangedListener(mTextWatcher);
-		checkFieldsForEmptyValues();		
 
-		//get the friends button and make it not pressable
-		Button friendsButton = (Button) findViewById(R.id.friends_button);
-		friendsButton.setEnabled(false);		
+		checkFieldsForEmptyValues();			
+		
+		//get logout button and assign Click Listener
+		Button logoutButton = (Button) findViewById(R.id.logout_button);
+		logoutButton.setOnClickListener(new View.OnClickListener() {		
+			@Override
+			public void onClick(View arg0) {
+				// TODO
+				
+			}
+		});
 
 		//make the Back button go back to Recorder
 		Button backButton = (Button) findViewById(R.id.back_button);

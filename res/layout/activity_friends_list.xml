@@ -15,13 +15,13 @@
         android:weightSum="4" >
         
   	  	<Button
-	        android:id="@+id/friends_button"
+	        android:id="@+id/logout_button"
 	        android:background="#971425"
 	        android:layout_width="wrap_content"
 	        android:layout_height="match_parent"
 	        android:layout_weight="1"
 	        android:textColor="#ffffff"
-	        android:text="" />        
+	        android:text="Logout" />        
 
         <TextView
             android:layout_width="wrap_content"

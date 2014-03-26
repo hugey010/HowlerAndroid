@@ -91,7 +91,7 @@ public class MessagesList extends Activity {
 		messageList = Arrays.asList(audioPath.list(
 				new FilenameFilter(){
 					public boolean accept(File audioPath, String audioName){
-						return audioName.endsWith(".3gp");
+						return audioName.endsWith(".mp4");
 					}
 				}
 			));
@@ -100,7 +100,7 @@ public class MessagesList extends Activity {
 	public void DisplayMessageList(){
 		main =(LinearLayout) findViewById(R.id.messages);
 		for(final String message : messageList){
-			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 			LinearLayout layout = new LinearLayout(getApplicationContext());
 			LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 			
