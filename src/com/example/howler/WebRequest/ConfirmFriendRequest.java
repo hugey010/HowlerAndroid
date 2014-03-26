@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.net.URI;
 
 import org.apache.http.client.methods.HttpUriRequest;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -15,21 +17,20 @@ import android.util.Log;
 
 import com.octo.android.robospice.request.springandroid.SpringAndroidSpiceRequest;
 
-public class AddFriendRequest extends SpringAndroidSpiceRequest<ErrorResponseObject> {
-	private static final String TAG = "Add Friend Request";
+public class ConfirmFriendRequest extends SpringAndroidSpiceRequest<ErrorResponseObject> {
+	private static final String TAG = "Confirm Friend Request";
 
 	private Username username;
 	private String auth_token;
-
-	public AddFriendRequest(Username username, String auth_token) {
+	public ConfirmFriendRequest(Username username, String auth_token) {
 		super(ErrorResponseObject.class);
-		this.username = username;
 		this.auth_token = auth_token;
+		this.username = username;
 	}
 
 	@Override
 	public ErrorResponseObject loadDataFromNetwork() throws Exception {
-		String url = JsonSpiceService.baseURL + "addFriend";
+		String url = JsonSpiceService.baseURL + "confirmFriend";
 
 		ClientHttpRequestFactory fac = new HttpComponentsClientHttpRequestFactory() {
 
@@ -54,6 +55,10 @@ public class AddFriendRequest extends SpringAndroidSpiceRequest<ErrorResponseObj
 
 		RestTemplate restTemplate = getRestTemplate();
 		restTemplate.setRequestFactory(fac);
-		return restTemplate.postForObject(url, this.username, ErrorResponseObject.class);
+		//return restTemplate.put(url, this.username);
+		HttpEntity<Username> request = new HttpEntity<Username>(username);
+		ResponseEntity<ErrorResponseObject> entity = restTemplate.exchange(url, HttpMethod.PUT, request, ErrorResponseObject.class);
+		return entity.getBody();
 	}
+	
 }

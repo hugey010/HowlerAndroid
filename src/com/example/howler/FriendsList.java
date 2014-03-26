@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.example.howler.WebRequest.AddFriendRequest;
+import com.example.howler.WebRequest.ConfirmFriendRequest;
 import com.example.howler.WebRequest.ErrorResponseObject;
 import com.example.howler.WebRequest.Friend;
 import com.example.howler.WebRequest.FriendListObject;
@@ -18,6 +19,7 @@ import com.octo.android.robospice.request.listener.RequestListener;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -37,7 +39,7 @@ public class FriendsList extends Activity {
 	private EditText searchFriend;
 	protected SpiceManager spiceManager = new SpiceManager(JsonSpiceService.class);
 	private DatabaseHelper dh;
-	private List<String> friend_list;
+	private List<Friend> friend_list;
 	private LinearLayout main;
 
 	@Override
@@ -95,7 +97,7 @@ public class FriendsList extends Activity {
 
 
 		dh = new DatabaseHelper(this.getApplicationContext());
-		
+
 		//get friend search edittext and listen for text
 		searchFriend = (EditText) findViewById(R.id.friendsearch_edittext);
 		searchFriend.addTextChangedListener(mTextWatcher);
@@ -157,11 +159,7 @@ public class FriendsList extends Activity {
 	}
 
 	public void populateFriendList(FriendListObject friendList){
-		friend_list = new ArrayList<String>();
-		List<Friend> friends = friendList.getFriends();
-		for (final Friend friend : friends) {
-			friend_list.add(friend.getUsername());
-		}
+		friend_list = friendList.getFriends();
 	}
 
 	public void displayFriends() {
@@ -171,16 +169,20 @@ public class FriendsList extends Activity {
 			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 			LinearLayout layout = new LinearLayout(getApplicationContext());
 			LinearLayout.LayoutParams textparams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+
 			layout.setOrientation(LinearLayout.VERTICAL);
 			layout.setLayoutParams(params);
+
 			TextView none = new TextView(getApplicationContext());
 			none.setLayoutParams(textparams);
 			none.setText("No Friends :(");
+
 			layout.addView(none);
 			main.addView(layout);
 		} else {
 			Log.d(TAG, "Num of friends: "+friend_list.size());
-			for(final String message : friend_list){
+			for(final Friend friend : friend_list){
+				Log.d(TAG, "username: "+friend.getUsername()+" pending: "+friend.isPending());
 				LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 				LinearLayout layout = new LinearLayout(getApplicationContext());
 				LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -189,7 +191,26 @@ public class FriendsList extends Activity {
 				layout.setLayoutParams(params);
 				Button btnMessage = new Button(getApplicationContext());
 				btnMessage.setLayoutParams(buttonParams);
-				btnMessage.setText(message);
+				btnMessage.setText(friend.getUsername());
+
+				if (friend.isPending()) {
+					btnMessage.setBackgroundColor(Color.BLUE);
+					//btnMessage.append(" - Click to Confirm Friend");
+					btnMessage.setOnClickListener(new View.OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							// TODO action for confirming friend
+							Username username = new Username();
+							username.setUsername(((Button)v).getText().toString());
+							Log.d(TAG, "username: "+username.getUsername());
+							FriendsList.this.setProgressBarIndeterminateVisibility(true);
+							ConfirmFriendRequest request = new ConfirmFriendRequest(username, dh.authToken());
+							spiceManager.execute(request, username, DurationInMillis.ALWAYS_EXPIRED, new ConfirmFriendRequestListener());
+						}
+					});
+				} else {
+					// TODO select friend for sending
+				}
 
 				layout.addView(btnMessage);
 				main.addView(layout);	
@@ -234,7 +255,7 @@ public class FriendsList extends Activity {
 		public void onRequestSuccess(ErrorResponseObject error) {
 			Log.d(TAG, "success: "+error.isSuccess()+" message: " + error.getMessage());
 			if (error.isSuccess()) {
-			Toast.makeText(getApplicationContext(), "Sent friend request", Toast.LENGTH_LONG).show();
+				Toast.makeText(getApplicationContext(), "Sent friend request", Toast.LENGTH_LONG).show();
 			} else {
 				Toast.makeText(getApplicationContext(), "Failed to add friend: "+error.getMessage(), Toast.LENGTH_LONG).show();
 			}
@@ -243,4 +264,23 @@ public class FriendsList extends Activity {
 
 	}
 
+	private class ConfirmFriendRequestListener implements RequestListener<ErrorResponseObject> {
+
+		@Override
+		public void onRequestFailure(SpiceException exception) {
+			Log.e(TAG, "failure" + exception.getMessage());
+			Toast.makeText(getApplicationContext(), "Failed to confirm friend", Toast.LENGTH_LONG).show();
+		}
+
+		@Override
+		public void onRequestSuccess(ErrorResponseObject error) {
+			Log.d(TAG, "success: "+error.isSuccess()+" message: " + error.getMessage());
+			if (error.isSuccess()) {
+				Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
+			} else {
+				Toast.makeText(getApplicationContext(), "Failed to confirm friend: "+error.getMessage(), Toast.LENGTH_LONG).show();
+			}
+		}
+
+	}
 }
