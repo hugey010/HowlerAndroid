@@ -18,10 +18,11 @@ import com.octo.android.robospice.persistence.springandroid.json.jackson.Jackson
 public class JsonSpiceService extends SpringAndroidSpiceService {
 	
 	public static final String baseURL = "http://howler-goapp-1.herokuapp.com/";
+	//public static final String baseURL = "http://192.168.1.63:5000/";
 
 	@Override
 	public RestTemplate createRestTemplate() {
-
+		
 	    RestTemplate restTemplate = new RestTemplate();
 	    //find more complete examples in RoboSpice Motivation app
 	    //to enable Gzip compression and setting request timeouts.

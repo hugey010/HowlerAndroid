@@ -41,6 +41,7 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
 	private EditText titleEditableField;
 	private AudioRecord voiceRecorder;
 	private static String audioFile;
+	private static String messageTitle;
 	private boolean isRecording = false;
 	private View btnPlay;
 	private View btnRecord;
@@ -53,6 +54,9 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
 	
 	public static String filePath() {
 		return audioFile;
+	}
+	public static String messageTitle() {
+		return messageTitle;
 	}
 	
 	private TextWatcher mTextWatcher = new TextWatcher() {
@@ -79,6 +83,7 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
 		Button deleteButton = (Button) findViewById(R.id.delete_button);
 
 		String title = titleEditableField.getText().toString();
+		messageTitle = title;
 
 		if(title.length()>0){
 			playButton.setEnabled(true);

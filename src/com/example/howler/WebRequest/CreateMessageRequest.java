@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
 import android.util.Log;
@@ -17,7 +18,7 @@ import com.example.howler.DatabaseHelper;
 import com.octo.android.robospice.request.springandroid.SpringAndroidSpiceRequest;
 
 public class CreateMessageRequest extends SpringAndroidSpiceRequest<Message> {
-	private static final String TAG = "MessageUploadRequest";
+	private static final String TAG = "MessageCreateRequest";
 	private Message message;
 	private DatabaseHelper db;
 	
@@ -55,6 +56,9 @@ public class CreateMessageRequest extends SpringAndroidSpiceRequest<Message> {
 		
 		RestTemplate restTemplate = getRestTemplate();
 		restTemplate.setRequestFactory(fac);	
+		restTemplate.getMessageConverters().add(new FormHttpMessageConverter());
+
+		
 		return restTemplate.postForObject(url, this.message, Message.class);
 	}
 

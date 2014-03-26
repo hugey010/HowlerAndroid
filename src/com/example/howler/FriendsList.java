@@ -6,6 +6,9 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
+
 import com.example.howler.WebRequest.AddFriendRequest;
 import com.example.howler.WebRequest.ConfirmFriendRequest;
 import com.example.howler.WebRequest.CreateMessageRequest;
@@ -13,6 +16,7 @@ import com.example.howler.WebRequest.ErrorResponseObject;
 import com.example.howler.WebRequest.Friend;
 import com.example.howler.WebRequest.FriendsListRequest;
 import com.example.howler.WebRequest.JsonSpiceService;
+import com.example.howler.WebRequest.MessageUploadRequest;
 import com.example.howler.WebRequest.Username;
 import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.DurationInMillis;
@@ -113,8 +117,10 @@ public class FriendsList extends Activity {
 		logoutButton.setOnClickListener(new View.OnClickListener() {		
 			@Override
 			public void onClick(View arg0) {
-				// TODO
-
+				dh.clearPesistentUser();
+				Intent intent = new Intent(FriendsList.this, LoginActivity.class);
+				FriendsList.this.startActivity(intent);
+				finish();
 			}
 		});
 
@@ -153,7 +159,7 @@ public class FriendsList extends Activity {
 				// check input fields
 				
 				com.example.howler.WebRequest.Message message = new com.example.howler.WebRequest.Message();
-				message.setTitle("testing title");
+				message.setTitle(RecorderActivity.messageTitle());
 				try {
 					RandomAccessFile f = new RandomAccessFile(RecorderActivity.filePath(), "r");
 					byte[] data = new byte[(int)f.length()];
@@ -162,6 +168,8 @@ public class FriendsList extends Activity {
 					List<String> friends = new ArrayList<String>();
 					friends.add("hugey");
 					message.setUsernames(friends);
+					
+
 			
 				} catch (Exception e) {
 					Log.v(TAG, "failed to upload multipart. could not read audio file");
@@ -184,8 +192,17 @@ public class FriendsList extends Activity {
 	private class CreateMessageRequestListener implements RequestListener<com.example.howler.WebRequest.Message> {
 
 		@Override
-		public void onRequestFailure(SpiceException e) {
-			Log.v(TAG, e.getMessage());
+		public void onRequestFailure(SpiceException exception) {
+			Log.v(TAG, exception.getMessage());
+			if (exception.getCause() instanceof HttpClientErrorException) {
+				HttpClientErrorException e = (HttpClientErrorException)exception.getCause();
+				if (e.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
+					dh.clearPesistentUser();
+					Intent intent = new Intent(FriendsList.this, LoginActivity.class);
+					FriendsList.this.startActivity(intent);
+					finish();
+				}
+			}
 		}
 
 		@Override
@@ -193,7 +210,34 @@ public class FriendsList extends Activity {
 			// multipart upload of data
 			Log.v(TAG, "created message id: " + message.getMessage_id() + ", title: " + message.getTitle());
 			
+			MessageUploadRequest  request = new MessageUploadRequest(dh, message);
+			spiceManager.execute(request, message, DurationInMillis.ALWAYS_EXPIRED, new UploadMessageRequestListener());
 			
+		}
+		
+	}
+	
+	private class UploadMessageRequestListener implements RequestListener<String> {
+
+		@Override
+		public void onRequestFailure(SpiceException exception) {
+			Log.v(TAG, exception.getMessage());
+			if (exception.getCause() instanceof HttpClientErrorException) {
+				HttpClientErrorException e = (HttpClientErrorException)exception.getCause();
+				if (e.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
+					dh.clearPesistentUser();
+					Intent intent = new Intent(FriendsList.this, LoginActivity.class);
+					FriendsList.this.startActivity(intent);
+					finish();
+				}
+			}
+		}
+
+		@Override
+		public void onRequestSuccess(String s) {
+			// multipart upload of data
+			//Log.v(TAG, "uploaded message id: " + message.getMessage_id() + ", title: " + message.getTitle());
+			Log.v(TAG, "upload success string: " + s);
 		}
 		
 	}
@@ -271,6 +315,15 @@ public class FriendsList extends Activity {
 		public void onRequestFailure(SpiceException exception) {
 			Log.e(TAG, "failure" + exception.getMessage());
 			Toast.makeText(getApplicationContext(), "Failed to load friends", Toast.LENGTH_LONG).show();
+			if (exception.getCause() instanceof HttpClientErrorException) {
+				HttpClientErrorException e = (HttpClientErrorException)exception.getCause();
+				if (e.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
+					dh.clearPesistentUser();
+					Intent intent = new Intent(FriendsList.this, LoginActivity.class);
+					FriendsList.this.startActivity(intent);
+					finish();
+				}
+			}
 		}
 
 		@Override
@@ -289,6 +342,15 @@ public class FriendsList extends Activity {
 		public void onRequestFailure(SpiceException exception) {
 			Log.e(TAG, "failure" + exception.getMessage());
 			Toast.makeText(getApplicationContext(), "Failed to add friend", Toast.LENGTH_LONG).show();
+			if (exception.getCause() instanceof HttpClientErrorException) {
+				HttpClientErrorException e = (HttpClientErrorException)exception.getCause();
+				if (e.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
+					dh.clearPesistentUser();
+					Intent intent = new Intent(FriendsList.this, LoginActivity.class);
+					FriendsList.this.startActivity(intent);
+					finish();
+				}
+			}
 		}
 
 		@Override
@@ -310,6 +372,15 @@ public class FriendsList extends Activity {
 		public void onRequestFailure(SpiceException exception) {
 			Log.e(TAG, "failure" + exception.getMessage());
 			Toast.makeText(getApplicationContext(), "Failed to confirm friend", Toast.LENGTH_LONG).show();
+			if (exception.getCause() instanceof HttpClientErrorException) {
+				HttpClientErrorException e = (HttpClientErrorException)exception.getCause();
+				if (e.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
+					dh.clearPesistentUser();
+					Intent intent = new Intent(FriendsList.this, LoginActivity.class);
+					FriendsList.this.startActivity(intent);
+					finish();
+				}
+			}
 		}
 
 		@Override
