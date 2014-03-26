@@ -11,6 +11,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.View;
 import android.view.Window;
@@ -37,6 +39,43 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
 	private View btnMessagesList;
 	final Context context = this;
 	
+	private TextWatcher mTextWatcher = new TextWatcher() {
+		@Override
+		public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+		}
+
+		@Override
+		public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+		}
+
+		@Override
+		public void afterTextChanged(Editable editable) {
+			// check Fields For Empty Values
+			checkFieldsForEmptyValues();
+		}
+
+	};
+	
+	//check if titleEditableField has string length > 0, if yes enable record, play, and delete button.
+	void checkFieldsForEmptyValues(){
+		Button playButton = (Button) findViewById(R.id.play_button);
+		ImageButton recordButton = (ImageButton) findViewById(R.id.record_button);
+		Button deleteButton = (Button) findViewById(R.id.delete_button);
+
+		String title = titleEditableField.getText().toString();
+
+		if(title.length()>0){
+			playButton.setEnabled(true);
+			recordButton.setEnabled(true);
+			deleteButton.setEnabled(true);
+
+		} else {
+			playButton.setEnabled(false);
+			recordButton.setEnabled(false);
+			deleteButton.setEnabled(false);
+		}
+	}		
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -55,6 +94,10 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
 		btnDelete = (Button) findViewById(R.id.delete_button);
 		btnDelete.setOnClickListener(this);
 		titleEditableField = (EditText) findViewById(R.id.enter_title);
+		titleEditableField.addTextChangedListener(mTextWatcher);
+		
+		checkFieldsForEmptyValues();			
+		
 		// setup friends and messages fragments
 //		if (findViewById(R.id.friends_list_container) != null) {
 //            if (savedInstanceState != null) {
@@ -110,15 +153,33 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
 		voicePlayer.start();	
 	}
 	private void deleteRecording(){
-		Toast.makeText(RecorderActivity.this, audioFile + "deleted", Toast.LENGTH_LONG).show();
-		File outFile = new File(audioFile);
-		outFile.delete();
-		audioFile = null;
-		btnPlay.setClickable(false);
-		btnDelete.setClickable(false);
-		btnRecord.setClickable(true);
-		titleEditableField.setText("");
-	}
+		//to have a dialog pop-up when trying to delete a null audiofile
+//		if (audioFile == null) {
+//			AlertDialog.Builder builder = new AlertDialog.Builder(context);
+//			builder.setTitle("Error");
+//			builder.setMessage("No audio file to delete.");
+//			builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//				
+//				@Override
+//				public void onClick(DialogInterface dialog, int which) {
+//					dialog.cancel();
+//					titleEditableField.requestFocus();
+//				}
+//			});
+//			AlertDialog alert = builder.create();
+//			alert.show();			
+//		}
+//		else {
+			Toast.makeText(RecorderActivity.this, audioFile + "deleted", Toast.LENGTH_LONG).show();
+			File outFile = new File(audioFile);
+			outFile.delete();
+			audioFile = null;
+			btnPlay.setClickable(false);
+			btnDelete.setClickable(false);
+			btnRecord.setClickable(true);
+			titleEditableField.setText("");
+		}
+//	}
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.friends_button:
@@ -130,25 +191,25 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
     		startActivity(i2);			
 			break;
 	    case R.id.record_button:
-	    	if(titleEditableField.length()==0)
-	    	{
-				AlertDialog.Builder builder = new AlertDialog.Builder(context);
-				builder.setTitle("Error");
-				builder.setMessage("Please enter a title first.");
-				builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-					
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						dialog.cancel();
-						titleEditableField.requestFocus();
-					}
-				});
-				AlertDialog alert = builder.create();
-				alert.show();
-				break;
-			}	    
-	    	else
-	    	{
+//	    	if(titleEditableField.length()==0)
+//	    	{
+//				AlertDialog.Builder builder = new AlertDialog.Builder(context);
+//				builder.setTitle("Error");
+//				builder.setMessage("Please enter a title first.");
+//				builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//					
+//					@Override
+//					public void onClick(DialogInterface dialog, int which) {
+//						dialog.cancel();
+//						titleEditableField.requestFocus();
+//					}
+//				});
+//				AlertDialog alert = builder.create();
+//				alert.show();
+//				break;
+//			}	    
+//	    	else
+//	    	{
 		    	isRecording = !isRecording;	    		
 	    		if(isRecording){
 	    			startRecording();
@@ -158,7 +219,7 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
 	    			stopRecording();
 	    			break;
 	    		}
-	    	}
+//	    	}
 	    case R.id.play_button:
 	    	try {
 				playRecording();
@@ -167,7 +228,11 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
 			}
 	    	break;
 		case R.id.delete_button:
-			deleteRecording();
+			try {
+				deleteRecording();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}	
 	}
 }

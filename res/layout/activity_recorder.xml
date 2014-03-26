@@ -47,11 +47,12 @@
         android:id="@+id/play_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/audio_position"
+        android:layout_below="@+id/enter_title"
+        android:layout_marginTop="20dp"
         android:layout_alignLeft="@+id/enter_title"
-        android:layout_marginBottom="24dp"
-        android:text="@string/play"
-        android:clickable="false"/>
+        android:layout_marginBottom="10dp"
+        android:clickable="false"
+        android:text="@string/play" />
 
     <Button
         android:id="@+id/delete_button"
@@ -72,57 +73,43 @@
         android:layout_marginTop="33dp"
         android:text="@string/set_recip_vol" />
 
-    <TextView
-        android:id="@+id/set_recip_vol_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:text="@string/set_audio_pos" />
-
-    <SeekBar
-        android:id="@+id/audio_position"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/set_recip_vol_text"
-        android:layout_alignParentLeft="true" />
-
     <SeekBar
         android:id="@+id/recipient_volume"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_marginBottom="54dp" />
 
-    <ImageButton
-        android:id="@+id/record_button"
+    <TextView
+        android:id="@+id/instr"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/audio_pos_text"
+        android:layout_below="@+id/header"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="15dp"
-        android:padding="5dp"
-        android:src="@drawable/record_button" />
-    
+        android:layout_marginTop="25dp"
+        android:text="Please enter a title before recording a message." />
 
     <EditText
         android:id="@+id/enter_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/play_button"
+        android:layout_below="@+id/instr"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="27dp"
+        android:layout_marginTop="18dp"
         android:ems="10"
         android:gravity="center"
-        android:hint="@string/title_text" >
+        android:hint="@string/title_text" />
 
-        <requestFocus />
-    </EditText>
-    
-	<FrameLayout
-    	android:id="@+id/friends_list_container"
-    	android:layout_width="240dp"
-    	android:layout_height="match_parent" />
+    <ImageButton
+        android:id="@+id/record_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/play_button"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:padding="5dp"
+        android:src="@drawable/record_button" />
 
 </RelativeLayout>
