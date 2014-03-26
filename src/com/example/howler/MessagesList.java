@@ -198,9 +198,8 @@ public class MessagesList extends Activity {
 			e.printStackTrace();
 		}
 		// Set and push to audio track..
-		int intSize = android.media.AudioTrack.getMinBufferSize(8000, AudioFormat.CHANNEL_IN_STEREO,
-		AudioFormat.ENCODING_PCM_16BIT); 
-		AudioTrack at = new AudioTrack(AudioManager.STREAM_MUSIC, 8000, AudioFormat.CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_16BIT, intSize, AudioTrack.MODE_STREAM);
+		int intSize = android.media.AudioTrack.getMinBufferSize(41000, AudioFormat.CHANNEL_IN_STEREO, AudioFormat.ENCODING_PCM_16BIT); 
+		AudioTrack at = new AudioTrack(AudioManager.STREAM_MUSIC, 41000, AudioFormat.CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_16BIT, intSize, AudioTrack.MODE_STREAM);
 		if (at!=null) { 
 			at.play();
 			// Write the byte array to the track

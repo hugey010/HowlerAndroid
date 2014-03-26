@@ -1,7 +1,12 @@
 package com.example.howler;
 
+import android.media.AudioFormat;
+import android.media.AudioManager;
+import android.media.AudioRecord;
+import android.media.AudioTrack;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
+import android.media.MediaRecorder.AudioSource;
 import android.os.Bundle;
 import android.os.Environment;
 import android.app.Activity;
@@ -13,6 +18,7 @@ import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.Window;
@@ -23,13 +29,17 @@ import android.widget.ImageButton;
 import android.widget.Button;
 import android.widget.Toast;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 
 public class RecorderActivity extends FragmentActivity implements OnClickListener {
+	private static final String TAG = "RecorderActivity";
+	
 	private EditText titleEditableField;
-	private MediaRecorder voiceRecorder;
-	private MediaPlayer voicePlayer;
+	private AudioRecord voiceRecorder;
 	private String audioFile;
 	private boolean isRecording = false;
 	private View btnPlay;
@@ -38,6 +48,9 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
 	private View btnFriendsList;
 	private View btnMessagesList;
 	final Context context = this;
+	private Thread recordingThread = null;
+	private Thread playingThread = null;
+
 	
 	private TextWatcher mTextWatcher = new TextWatcher() {
 		@Override
@@ -96,7 +109,9 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
 		titleEditableField = (EditText) findViewById(R.id.enter_title);
 		titleEditableField.addTextChangedListener(mTextWatcher);
 		
-		checkFieldsForEmptyValues();			
+		checkFieldsForEmptyValues();
+		
+		
 		
 		// setup friends and messages fragments
 //		if (findViewById(R.id.friends_list_container) != null) {
@@ -111,30 +126,52 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
 //		}
 		
 	}
+	
+	@Override
+	public void onStop() {
+		if (voiceRecorder != null) {
+			voiceRecorder.release();
+			voiceRecorder = null;
+		}
+		super.onStop();
+	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.recorder, menu);
 		return true;
 	}
+	
+	
+	
+	/*
 	private void startRecording(){
         try{
-        	voiceRecorder = new MediaRecorder();
+    			//int intSize = android.media.AudioTrack.getMinBufferSize(8000, AudioFormat.CHANNEL_IN_STEREO,
+    			//AudioFormat.ENCODING_PCM_16BIT); 
+    			//AudioTrack at = new AudioTrack(AudioManager.STREAM_MUSIC, 8000, AudioFormat.CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_16BIT, intSize, AudioTrack.MODE_STREAM);
+            int bufferSize = AudioRecord.getMinBufferSize(44100, AudioFormat.CHANNEL_IN_STEREO, AudioFormat.ENCODING_PCM_16BIT); 
+        	//voiceRecorder = new AudioRecord(AudioManager., 44100, AudioFormat.CHANNEL_IN_STEREO, AudioFormat.ENCODING_PCM_16BIT, AudioTrack.MODE_STREAM);
+        	
+        	
             String title = this.titleEditableField.getText().toString();
             audioFile = Environment.getDataDirectory().getAbsolutePath() + "/data/com.example.howler/" + title + ".mp4";
     		Toast.makeText(RecorderActivity.this, "recording file in: " + audioFile, Toast.LENGTH_LONG).show();	
-        	voiceRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        	voiceRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-        	voiceRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-        	voiceRecorder.setOutputFile(audioFile);
-        	voiceRecorder.prepare();
-        	voiceRecorder.start();
+        	//voiceRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        	//voiceRecorder.setOutputFormat(MediaRecorder.OutputFormat.);
+        	//voiceRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+        	//voiceRecorder.setOutputFile(audioFile);
+        	//voiceRecorder.prepare();
+        	//voiceRecorder.start();
         	title = null;
         } catch(IOException e){
         	e.printStackTrace();
         }
 	}
+	*/
 	
+	/*
 	private void stopRecording(){
 		Toast.makeText(RecorderActivity.this, "stopped recording", Toast.LENGTH_LONG).show();
 		voiceRecorder.stop();
@@ -144,14 +181,27 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
 		btnDelete.setClickable(true);
 		btnRecord.setClickable(false);
 	}
+	*/
 	
 	private void playRecording() throws Exception{
-		voicePlayer = new MediaPlayer();
+		//voicePlayer = new MediaPlayer();
 		Toast.makeText(RecorderActivity.this, "started playing file at" + audioFile, Toast.LENGTH_LONG).show();
-		voicePlayer.setDataSource(audioFile);
-		voicePlayer.prepare();
-		voicePlayer.start();	
+		//voicePlayer.setDataSource(audioFile);
+		//voicePlayer.prepare();
+		//voicePlayer.start();	
+	    playingThread = new Thread(new Runnable() {
+	        public void run() {
+	    		try {
+					PlayShortAudioFileViaAudioTrack(audioFile);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	        }
+	    }, "AudioPlayer Thread");
+	    playingThread.start();
 	}
+	
 	private void deleteRecording(){
 		//dialog pop-up when trying to delete a null audiofile
 		if (audioFile == null) {
@@ -180,6 +230,149 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
 			titleEditableField.setText("");
 		}
 	}
+	
+	private static int[] mSampleRates = new int[] { 8000, 11025, 22050, 44100 };
+	public AudioRecord findAudioRecord() {
+	    for (int rate : mSampleRates) {
+	        for (short audioFormat : new short[] { AudioFormat.ENCODING_PCM_8BIT, AudioFormat.ENCODING_PCM_16BIT }) {
+	            for (short channelConfig : new short[] { AudioFormat.CHANNEL_IN_MONO, AudioFormat.CHANNEL_IN_STEREO }) {
+	                try {
+	                    Log.d(TAG, "Attempting rate " + rate + "Hz, bits: " + audioFormat + ", channel: "
+	                            + channelConfig);
+	                    int bufferSize = AudioRecord.getMinBufferSize(rate, channelConfig, audioFormat);
+
+	                    if (bufferSize != AudioRecord.ERROR_BAD_VALUE) {
+	                        // check if we can instantiate and have a success
+	                        AudioRecord recorder = new AudioRecord(AudioSource.DEFAULT, rate, channelConfig, audioFormat, bufferSize);
+	                        
+
+	                        if (recorder.getState() == AudioRecord.STATE_INITIALIZED)
+	                            return recorder;
+	                    }
+	                } catch (Exception e) {
+	                    Log.e(TAG, rate + "Exception, keep trying.",e);
+	                }
+	            }
+	        }
+	    }
+	    return null;
+	}
+	
+	private void startRecording() {
+
+        String title = this.titleEditableField.getText().toString();
+        audioFile = Environment.getDataDirectory().getAbsolutePath() + "/data/com.example.howler/" + title + ".pcm";
+		
+        int buffSize = AudioRecord.getMinBufferSize(44100, AudioFormat.CHANNEL_IN_STEREO, AudioFormat.ENCODING_PCM_16BIT);
+
+        //findAudioRecord();
+	    voiceRecorder =  new AudioRecord(MediaRecorder.AudioSource.MIC, 44100, AudioFormat.CHANNEL_IN_STEREO, AudioFormat.ENCODING_PCM_16BIT, buffSize);
+	    voiceRecorder.startRecording();
+	    isRecording = true;
+	    recordingThread = new Thread(new Runnable() {
+	        public void run() {
+	            writeAudioDataToFile();
+	        }
+	    }, "AudioRecorder Thread");
+	    recordingThread.start();
+	}
+
+	    //convert short to byte
+	private byte[] short2byte(short[] sData) {
+	    int shortArrsize = sData.length;
+	    byte[] bytes = new byte[shortArrsize * 2];
+	    for (int i = 0; i < shortArrsize; i++) {
+	        bytes[i * 2] = (byte) (sData[i] & 0x00FF);
+	        bytes[(i * 2) + 1] = (byte) (sData[i] >> 8);
+	        sData[i] = 0;
+	    }
+	    return bytes;
+
+	}
+
+	int BytesPerElement = 2; // 2 bytes in 16bit format
+	int BufferElements2Rec = 1024; // want to play 2048 (2K) since 2 bytes we use only 1024
+
+	private void writeAudioDataToFile() {
+	    // Write the output audio in byte
+
+	    short sData[] = new short[BufferElements2Rec];
+
+	    FileOutputStream os = null;
+	    try {
+	        os = new FileOutputStream(audioFile);
+	    } catch (FileNotFoundException e) {
+	        e.printStackTrace();
+	    }
+
+	    while (isRecording) {
+	        // gets the voice output from microphone to byte format
+
+	        voiceRecorder.read(sData, 0, BufferElements2Rec);
+	        try {
+	            // // writes the data to file from buffer
+	            // // stores the voice buffer
+	            byte bData[] = short2byte(sData);
+	            os.write(bData, 0, BufferElements2Rec * BytesPerElement);
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+	    }
+	    try {
+	        os.close();
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	    }
+	}
+
+	private void stopRecording() {
+	    // stops the recording activity
+		Toast.makeText(RecorderActivity.this, "stopped recording", Toast.LENGTH_LONG).show();
+
+	    if (null != voiceRecorder) {
+	        isRecording = false;
+	        voiceRecorder.stop();
+	        voiceRecorder.release();
+	        voiceRecorder = null;
+	        recordingThread = null;
+	    }
+	    
+		btnPlay.setClickable(true);
+		btnDelete.setClickable(true);
+		btnRecord.setClickable(false);
+	}
+	
+	private void PlayShortAudioFileViaAudioTrack(String filePath) throws IOException
+	{
+		if (filePath==null)
+			return;
+	
+		//Reading the file..
+		byte[] byteData = null; 
+		File file = new File(filePath);
+		byteData = new byte[(int) file.length()];
+		FileInputStream in = null;
+		try {
+			in = new FileInputStream( file );
+			in.read( byteData );
+			in.close(); 
+	
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		// Set and push to audio track..
+		int intSize = android.media.AudioTrack.getMinBufferSize(41000, AudioFormat.CHANNEL_IN_STEREO, AudioFormat.ENCODING_PCM_16BIT); 
+		AudioTrack at = new AudioTrack(AudioManager.STREAM_MUSIC, 41000, AudioFormat.CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_16BIT, intSize, AudioTrack.MODE_STREAM);
+		if (at!=null) { 
+			at.play();
+			// Write the byte array to the track
+			at.write(byteData, 0, byteData.length); 
+			at.stop();
+			at.release();
+		}
+
+	}
+	
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.friends_button:
