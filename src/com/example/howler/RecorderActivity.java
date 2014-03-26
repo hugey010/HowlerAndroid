@@ -73,10 +73,10 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
         try{
         	voiceRecorder = new MediaRecorder();
             String title = this.titleEditableField.getText().toString();
-            audioFile = Environment.getDataDirectory().getAbsolutePath() + "/data/com.example.howler/" + title + ".3gp";
+            audioFile = Environment.getDataDirectory().getAbsolutePath() + "/data/com.example.howler/" + title + ".mp4";
     		Toast.makeText(RecorderActivity.this, "recording file in: " + audioFile, Toast.LENGTH_LONG).show();	
         	voiceRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        	voiceRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        	voiceRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
         	voiceRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
         	voiceRecorder.setOutputFile(audioFile);
         	voiceRecorder.prepare();

@@ -1,15 +1,27 @@
 package com.example.howler;
 
+
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.example.howler.WebRequest.Message;
+import com.example.howler.WebRequest.MessageListObject;
+import com.example.howler.WebRequest.MessagesListRequest;
+import com.octo.android.robospice.SpiceManager;
+import com.octo.android.robospice.persistence.DurationInMillis;
+import com.octo.android.robospice.persistence.exception.SpiceException;
+import com.octo.android.robospice.request.listener.RequestListener;
+import com.example.howler.WebRequest.JsonSpiceService;
+
+
 import android.os.Bundle;
 import android.os.Environment;
 import android.app.Activity;
 import android.content.Intent;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -21,9 +33,28 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 public class MessagesList extends Activity {
+
 	
 	private List<String> messageList;
 	private LinearLayout main;
+
+
+	private static final String TAG = "Messages List Activity";
+	protected SpiceManager spiceManager = new SpiceManager(JsonSpiceService.class);
+	
+	@Override
+	public void onStop() {
+		super.onStop();
+		spiceManager.shouldStop();
+	}
+	
+	@Override
+	public void onStart() {
+		super.onStart();
+		 spiceManager.start(this);
+	}
+	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -43,9 +74,17 @@ public class MessagesList extends Activity {
 			@Override
 			public void onClick(View v) {
 				Intent i = new Intent(getApplicationContext(), com.example.howler.RecorderActivity.class);
-				startActivity(i);				
+				startActivity(i);		
 			}
 		});
+		
+		// send request
+		MessagesList.this.setProgressBarIndeterminateVisibility(true);
+		MessageListObject messageList = new MessageListObject();
+		MessagesListRequest request = new MessagesListRequest(messageList);
+		spiceManager.execute(request, new MessageListRequestListener());
+		spiceManager.execute(request, messageList, DurationInMillis.ALWAYS_EXPIRED, new MessageListRequestListener());
+	
 	}
 	public void PopulateMessageList(){
 		File audioPath = new File(Environment.getDataDirectory().getAbsolutePath() + "/data/com.example.howler/");
@@ -80,7 +119,28 @@ public class MessagesList extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.messages_list, menu);
+		
 		return true;
+	}
+	
+	private class MessageListRequestListener implements RequestListener<MessageListObject> {
+
+		@Override
+		public void onRequestFailure(SpiceException exception) {
+			Log.e(TAG, "failure" + exception.toString());
+			
+			
+		}
+
+		@Override
+		public void onRequestSuccess(MessageListObject messages) {
+			
+			
+			Log.d(TAG, "success, number of messages: " + messages.getMessages().size());
+
+			
+		}
+		
 	}
 
 }
