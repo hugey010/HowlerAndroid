@@ -21,11 +21,11 @@ import com.octo.android.robospice.request.springandroid.SpringAndroidSpiceReques
 public class MessagesListRequest extends SpringAndroidSpiceRequest<Message.List> {
 
 	private static final String TAG = "Messages List Request";
-	private String authToken;
+	private DatabaseHelper db;
 	
-	public MessagesListRequest(String authToken) {
+	public MessagesListRequest(DatabaseHelper database) {
 		super(Message.List.class);
-		this.authToken = authToken;
+		this.db = database;
 	}
 	
 	@Override
@@ -41,7 +41,7 @@ public class MessagesListRequest extends SpringAndroidSpiceRequest<Message.List>
 		        uriRequest.addHeader(
 		                "Content-Type",
 		                MediaType.APPLICATION_JSON_VALUE);
-		        uriRequest.addHeader("Authorization", authToken);
+		        uriRequest.addHeader("Authorization", db.authToken());
 		        return uriRequest;
 		    }
 

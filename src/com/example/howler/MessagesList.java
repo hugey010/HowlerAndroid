@@ -35,7 +35,6 @@ import android.widget.Toast;
 public class MessagesList extends Activity {
 
 	
-	private List<String> messageList;
 	private LinearLayout main;
 	private DatabaseHelper dh;
 
@@ -63,8 +62,7 @@ public class MessagesList extends Activity {
 		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);		
 		setContentView(R.layout.activity_messages_list);
-		this.PopulateMessageList();
-		this.DisplayMessageList();
+		this.DisplayInitialMessageList();
 		//get the message button and make it not pressable
 		Button messageButton = (Button) findViewById(R.id.message_list_button);
 		messageButton.setEnabled(false);	
@@ -83,11 +81,12 @@ public class MessagesList extends Activity {
 		
 		// send request
 		MessagesList.this.setProgressBarIndeterminateVisibility(true);
-		MessagesListRequest request = new MessagesListRequest(dh.authToken());
+		MessagesListRequest request = new MessagesListRequest(dh);
 		spiceManager.execute(request, new MessageListRequestListener());
 		//spiceManager.execute(request, Message.List, DurationInMillis.ALWAYS_EXPIRED, new MessageListRequestListener());
 	
 	}
+	/*
 	public void PopulateMessageList(){
 		File audioPath = new File(Environment.getDataDirectory().getAbsolutePath() + "/data/com.example.howler/");
 		messageList = Arrays.asList(audioPath.list(
@@ -99,9 +98,14 @@ public class MessagesList extends Activity {
 			));
 		Toast.makeText(MessagesList.this, "Messages that exist:  " + messageList, Toast.LENGTH_LONG).show();
 	}
-	public void DisplayMessageList(){
+	*/
+	public void DisplayInitialMessageList() {
+		
+	}
+	
+	public void DisplayMessageList(List<Message> messagesList){
 		main =(LinearLayout) findViewById(R.id.messages);
-		for(final String message : messageList){
+		for(final Message m : messagesList){
 			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 			LinearLayout layout = new LinearLayout(getApplicationContext());
 			LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -109,25 +113,27 @@ public class MessagesList extends Activity {
 			layout.setLayoutParams(params);
 			Button btnMessage = new Button(getApplicationContext());
 			btnMessage.setLayoutParams(buttonParams);
-			btnMessage.setText(message);
+			btnMessage.setText(m.getTitle());
 			btnMessage.setOnClickListener(new View.OnClickListener() {
 				
 				@Override
 				public void onClick(View v) {
-					playBack(message);
+					playBack(m);
 				}
 			});
 			layout.addView(btnMessage);
 			main.addView(layout);		
 		}	
 	}
-	public void playBack(String message){
-		Toast.makeText(MessagesList.this, "message trying to play is:" + message, Toast.LENGTH_LONG).show();
+	public void playBack(Message m){
+		Toast.makeText(MessagesList.this, "message trying to play is:" + m.getUsername(), Toast.LENGTH_LONG).show();
 		//AlertDialog.Builder builder = new AlertDialog.Builder(getApplication());
 		//builder.setMessage("MESSAGE:" + message)
 		//		.setTitle("TITLE");
 		//AlertDialog dialog = builder.create();
 		//dialog.show();
+		
+		
 		
 			
 	}
@@ -149,7 +155,10 @@ public class MessagesList extends Activity {
 			if (exception.getCause() instanceof HttpClientErrorException) {
 				HttpClientErrorException e = (HttpClientErrorException)exception.getCause();
 				if (e.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
-					
+					dh.clearPesistentUser();
+					Intent intent = new Intent(MessagesList.this, LoginActivity.class);
+					MessagesList.this.startActivity(intent);
+					finish();
 				}
 			}
 		}
@@ -157,8 +166,8 @@ public class MessagesList extends Activity {
 		@Override
 		public void onRequestSuccess(Message.List messages) {
 			
-			
-			Log.d(TAG, "success, number of messages: " + messages.getMessages().size() + " msss: " + messages.getMessages().get(0).getTitle());	
+			DisplayMessageList(messages.getMessages());
+			Log.d(TAG, "success, number of messages: " + messages.getMessages().size());	
 			
 		}
 		
