@@ -31,15 +31,7 @@ public class MessagesListRequest extends SpringAndroidSpiceRequest<Message.List>
 	@Override
 	public Message.List loadDataFromNetwork() throws Exception {
 		String url = JsonSpiceService.baseURL + "messages";
-		
-		/*
-		MappingJacksonHttpMessageConverter converter = new MappingJacksonHttpMessageConverter();
-		//converter.getObjectMapper().configure(Feature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true);
-		//converter.getObjectMapper().configure(Feature.UNWRAP_ROOT_VALUE, true);
-		
-		converter.getObjectMapper().configure(Feature.AUTO_DETECT_SETTERS, true);
-		converter.getObjectMapper().configure(Feature.AUTO_DETECT_FIELDS, true);
-			*/
+	
 		ClientHttpRequestFactory fac = new HttpComponentsClientHttpRequestFactory() {
 
 		    @Override
@@ -49,7 +41,7 @@ public class MessagesListRequest extends SpringAndroidSpiceRequest<Message.List>
 		        uriRequest.addHeader(
 		                "Content-Type",
 		                MediaType.APPLICATION_JSON_VALUE);
-		        uriRequest.addHeader("Authorization", "VZ3z5rELK0FS91mqUWuwBn4fs7tceMWhfASuojf3wLOCH862yY");
+		        uriRequest.addHeader("Authorization", authToken);
 		        return uriRequest;
 		    }
 
@@ -63,12 +55,7 @@ public class MessagesListRequest extends SpringAndroidSpiceRequest<Message.List>
 		
 		RestTemplate restTemplate = getRestTemplate();
 		restTemplate.setRequestFactory(fac);
-		//restTemplate.getMessageConverters().add(converter);
-		return restTemplate.getForObject(url, Message.List.class);
-		//restTemplate.set
-		
-		
-		//return getRestTemplate().getForObject(url, MessageListObject.class);
+		return restTemplate.getForObject(url, Message.List.class);	
 	}
 	
 
