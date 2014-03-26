@@ -13,22 +13,23 @@ import org.springframework.web.client.RestTemplate;
 
 import android.util.Log;
 
-import com.example.howler.DatabaseHelper;
 import com.octo.android.robospice.request.springandroid.SpringAndroidSpiceRequest;
 
-public class AddFriendRequest extends SpringAndroidSpiceRequest<Username> {
+public class AddFriendRequest extends SpringAndroidSpiceRequest<ErrorResponseObject> {
 private static final String TAG = "Friends List Request";
 	
-	private String username;
+	private Username username;
+	private String auth_token;
 	
-	public AddFriendRequest(String username) {
-		super(Username.class);
+	public AddFriendRequest(Username username, String auth_token) {
+		super(ErrorResponseObject.class);
 		this.username = username;
+		this.auth_token = auth_token;
 	}
 
 	@Override
-	public Username loadDataFromNetwork() throws Exception {
-		String url = JsonSpiceService.baseURL + "friends";
+	public ErrorResponseObject loadDataFromNetwork() throws Exception {
+		String url = JsonSpiceService.baseURL + "addFriend";
 
 		ClientHttpRequestFactory fac = new HttpComponentsClientHttpRequestFactory() {
 
@@ -39,7 +40,7 @@ private static final String TAG = "Friends List Request";
 				uriRequest.addHeader(
 						"Content-Type",
 						MediaType.APPLICATION_JSON_VALUE);
-				uriRequest.addHeader("Authorization", "RHzITQk2rltEjUjx1B813I0zTJ3gaqIemq6G7PJ4W7FBuyMHYK");
+				uriRequest.addHeader("Authorization", auth_token);
 				return uriRequest;
 			}
 
@@ -53,6 +54,6 @@ private static final String TAG = "Friends List Request";
 
 		RestTemplate restTemplate = getRestTemplate();
 		restTemplate.setRequestFactory(fac);
-		return restTemplate.postForObject(url, this.username, Username.class);
+		return restTemplate.postForObject(url, this.username, ErrorResponseObject.class);
 	}
 }

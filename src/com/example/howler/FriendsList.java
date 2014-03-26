@@ -1,22 +1,21 @@
 package com.example.howler;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
+import com.example.howler.WebRequest.AddFriendRequest;
+import com.example.howler.WebRequest.ErrorResponseObject;
 import com.example.howler.WebRequest.Friend;
 import com.example.howler.WebRequest.FriendListObject;
 import com.example.howler.WebRequest.FriendsListRequest;
 import com.example.howler.WebRequest.JsonSpiceService;
+import com.example.howler.WebRequest.Username;
 import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.DurationInMillis;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 
 import android.os.Bundle;
-import android.os.Environment;
 import android.app.Activity;
 import android.content.Intent;
 import android.text.Editable;
@@ -30,7 +29,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -95,6 +93,9 @@ public class FriendsList extends Activity {
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);		
 		setContentView(R.layout.activity_friends_list);
 
+
+		dh = new DatabaseHelper(this.getApplicationContext());
+		
 		//get friend search edittext and listen for text
 		searchFriend = (EditText) findViewById(R.id.friendsearch_edittext);
 		searchFriend.addTextChangedListener(mTextWatcher);
@@ -127,7 +128,12 @@ public class FriendsList extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO action for add friend
-
+				Username username = new Username();
+				username.setUsername(searchFriend.getText().toString());
+				Log.d(TAG, "username to add: "+username.getUsername());
+				FriendsList.this.setProgressBarIndeterminateVisibility(true);
+				AddFriendRequest request = new AddFriendRequest(username, dh.authToken());
+				spiceManager.execute(request, username, DurationInMillis.ALWAYS_EXPIRED, new AddFriendRequestListener());
 			}
 		});
 
@@ -141,15 +147,13 @@ public class FriendsList extends Activity {
 			}
 		});
 
-		dh = new DatabaseHelper(this.getApplicationContext());
-
 		// send request
 		FriendsList.this.setProgressBarIndeterminateVisibility(true);
 		FriendListObject friendList = new FriendListObject();
 		FriendsListRequest request = new FriendsListRequest(dh.authToken());
 		spiceManager.execute(request, friendList, DurationInMillis.ALWAYS_EXPIRED, new FriendsListRequestListener());
 
-		
+
 	}
 
 	public void populateFriendList(FriendListObject friendList){
@@ -211,9 +215,30 @@ public class FriendsList extends Activity {
 		@Override
 		public void onRequestSuccess(FriendListObject friends) {
 			Log.d(TAG, "success, number of messages: " + friends.getFriends().size() + " friends: " + friends.getFriends());
-			
+
 			populateFriendList(friends);
 			displayFriends();
+		}
+
+	}
+
+	private class AddFriendRequestListener implements RequestListener<ErrorResponseObject> {
+
+		@Override
+		public void onRequestFailure(SpiceException exception) {
+			Log.e(TAG, "failure" + exception.getMessage());
+			Toast.makeText(getApplicationContext(), "Failed to add friend", Toast.LENGTH_LONG).show();
+		}
+
+		@Override
+		public void onRequestSuccess(ErrorResponseObject error) {
+			Log.d(TAG, "success: "+error.isSuccess()+" message: " + error.getMessage());
+			if (error.isSuccess()) {
+			Toast.makeText(getApplicationContext(), "Sent friend request", Toast.LENGTH_LONG).show();
+			} else {
+				Toast.makeText(getApplicationContext(), "Failed to add friend: "+error.getMessage(), Toast.LENGTH_LONG).show();
+			}
+			searchFriend.setText("");
 		}
 
 	}
