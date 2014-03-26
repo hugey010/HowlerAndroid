@@ -91,7 +91,7 @@ public class MessagesList extends Activity {
 		messageList = Arrays.asList(audioPath.list(
 				new FilenameFilter(){
 					public boolean accept(File audioPath, String audioName){
-						return audioName.endsWith(".3gp");
+						return audioName.endsWith(".mp4");
 					}
 				}
 			));
