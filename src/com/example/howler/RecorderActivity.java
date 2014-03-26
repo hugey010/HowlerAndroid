@@ -153,23 +153,23 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
 		voicePlayer.start();	
 	}
 	private void deleteRecording(){
-		//to have a dialog pop-up when trying to delete a null audiofile
-//		if (audioFile == null) {
-//			AlertDialog.Builder builder = new AlertDialog.Builder(context);
-//			builder.setTitle("Error");
-//			builder.setMessage("No audio file to delete.");
-//			builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//				
-//				@Override
-//				public void onClick(DialogInterface dialog, int which) {
-//					dialog.cancel();
-//					titleEditableField.requestFocus();
-//				}
-//			});
-//			AlertDialog alert = builder.create();
-//			alert.show();			
-//		}
-//		else {
+		//dialog pop-up when trying to delete a null audiofile
+		if (audioFile == null) {
+			AlertDialog.Builder builder = new AlertDialog.Builder(context);
+			builder.setTitle("Error");
+			builder.setMessage("No audio file to delete.");
+			builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.cancel();
+					titleEditableField.requestFocus();
+				}
+			});
+			AlertDialog alert = builder.create();
+			alert.show();			
+		}
+		else {
 			Toast.makeText(RecorderActivity.this, audioFile + "deleted", Toast.LENGTH_LONG).show();
 			File outFile = new File(audioFile);
 			outFile.delete();
@@ -179,7 +179,7 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
 			btnRecord.setClickable(true);
 			titleEditableField.setText("");
 		}
-//	}
+	}
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.friends_button:
