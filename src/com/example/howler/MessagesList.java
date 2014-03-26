@@ -6,6 +6,9 @@ import java.io.FilenameFilter;
 import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
+
 import com.example.howler.WebRequest.Message;
 import com.example.howler.WebRequest.MessagesListRequest;
 import com.octo.android.robospice.SpiceManager;
@@ -141,8 +144,14 @@ public class MessagesList extends Activity {
 		@Override
 		public void onRequestFailure(SpiceException exception) {
 			Log.e(TAG, "failure" + exception.getMessage());
-			
-			
+
+			// detect invalid auth
+			if (exception.getCause() instanceof HttpClientErrorException) {
+				HttpClientErrorException e = (HttpClientErrorException)exception.getCause();
+				if (e.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
+					
+				}
+			}
 		}
 
 		@Override
