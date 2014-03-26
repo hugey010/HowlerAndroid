@@ -5,7 +5,10 @@ import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
@@ -32,6 +35,8 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
 	private View btnDelete;
 	private View btnFriendsList;
 	private View btnMessagesList;
+	final Context context = this;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -125,15 +130,35 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
     		startActivity(i2);			
 			break;
 	    case R.id.record_button:
-	    	isRecording = !isRecording;
-	    	if(isRecording){
-	            startRecording();
-	            break;
-	    	}
-			else {
-				stopRecording();
+	    	if(titleEditableField.length()==0)
+	    	{
+				AlertDialog.Builder builder = new AlertDialog.Builder(context);
+				builder.setTitle("Error");
+				builder.setMessage("Please enter a title first.");
+				builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.cancel();
+						titleEditableField.requestFocus();
+					}
+				});
+				AlertDialog alert = builder.create();
+				alert.show();
 				break;
-			}
+			}	    
+	    	else
+	    	{
+		    	isRecording = !isRecording;	    		
+	    		if(isRecording){
+	    			startRecording();
+	    			break;
+	    		}
+	    		else {
+	    			stopRecording();
+	    			break;
+	    		}
+	    	}
 	    case R.id.play_button:
 	    	try {
 				playRecording();
