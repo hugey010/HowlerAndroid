@@ -149,13 +149,15 @@ public class FriendsList extends Activity {
 		FriendsListRequest request = new FriendsListRequest(dh.authToken());
 		spiceManager.execute(request, friendList, DurationInMillis.ALWAYS_EXPIRED, new FriendsListRequestListener());
 
-		populateFriendList(friendList);
-		displayFriends();
+		
 	}
 
 	public void populateFriendList(FriendListObject friendList){
 		friend_list = new ArrayList<String>();
-		//List<Friend> friends = friendList.getFriends();
+		List<Friend> friends = friendList.getFriends();
+		for (final Friend friend : friends) {
+			friend_list.add(friend.getUsername());
+		}
 	}
 
 	public void displayFriends() {
@@ -202,12 +204,16 @@ public class FriendsList extends Activity {
 
 		@Override
 		public void onRequestFailure(SpiceException exception) {
-			Log.e(TAG, "failure" + exception.getMessage());	
+			Log.e(TAG, "failure" + exception.getMessage());
+			Toast.makeText(getApplicationContext(), "Failed to load friends", Toast.LENGTH_LONG).show();
 		}
 
 		@Override
 		public void onRequestSuccess(FriendListObject friends) {
-			Log.d(TAG, "success, number of messages: " + friends.getFriends().size() + " friends: " + friends.getFriends());			
+			Log.d(TAG, "success, number of messages: " + friends.getFriends().size() + " friends: " + friends.getFriends());
+			
+			populateFriendList(friends);
+			displayFriends();
 		}
 
 	}
