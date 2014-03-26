@@ -225,7 +225,6 @@ public class MessagesList extends Activity {
 	        PlayShortAudioFileViaAudioTrack(path);	        
 	    	
 	    } catch (IOException ex) {
-	        String s = ex.toString();
 	        ex.printStackTrace();
 	    }
 	    
