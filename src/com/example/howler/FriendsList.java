@@ -160,21 +160,22 @@ public class FriendsList extends Activity {
 				
 				com.example.howler.WebRequest.Message message = new com.example.howler.WebRequest.Message();
 				message.setTitle(RecorderActivity.messageTitle());
-				try {
-					RandomAccessFile f = new RandomAccessFile(RecorderActivity.filePath(), "r");
-					byte[] data = new byte[(int)f.length()];
-					f.read(data);
-					message.setData(data);
+				//try {
+					//RandomAccessFile f = new RandomAccessFile(RecorderActivity.filePath(), "r");
+					//byte[] data = new byte[(int)f.length()];
+					//f.read(data);
+					//Log.v(TAG, "datalength = " + data.length);
+					//message.setData(data);
 					List<String> friends = new ArrayList<String>();
 					friends.add("hugey");
 					message.setUsernames(friends);
 					
 
 			
-				} catch (Exception e) {
-					Log.v(TAG, "failed to upload multipart. could not read audio file");
-				}
-				//message.setData();
+				//} catch (Exception e) {
+				//	Log.v(TAG, "failed to upload multipart. could not read audio file");
+				//}
+				
 				CreateMessageRequest request = new CreateMessageRequest(dh, message);
 				spiceManager.execute(request, message, DurationInMillis.ALWAYS_EXPIRED, new CreateMessageRequestListener());
 
@@ -210,11 +211,20 @@ public class FriendsList extends Activity {
 			// multipart upload of data
 			Log.v(TAG, "created message id: " + message.getMessage_id() + ", title: " + message.getTitle());
 			
-			MessageUploadRequest  request = new MessageUploadRequest(dh, message);
-			spiceManager.execute(request, message, DurationInMillis.ALWAYS_EXPIRED, new UploadMessageRequestListener());
-			
+			message.setTitle(RecorderActivity.messageTitle());
+			try {
+				 RandomAccessFile f = new RandomAccessFile(RecorderActivity.filePath(), "r");
+				 byte[] data = new byte[(int)f.length()];
+				 f.read(data);
+				 Log.v(TAG, "datalength = " + data.length);
+				 message.setData(data);
+				MessageUploadRequest  request = new MessageUploadRequest(dh, message);
+				spiceManager.execute(request, message, DurationInMillis.ALWAYS_EXPIRED, new UploadMessageRequestListener());
+
+			} catch (Exception e) {
+				Log.v(TAG, "failed to upload multipart. could not read audio file");
+			}
 		}
-		
 	}
 	
 	private class UploadMessageRequestListener implements RequestListener<String> {

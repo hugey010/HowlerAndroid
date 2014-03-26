@@ -1,5 +1,7 @@
 package com.example.howler.WebRequest;
 
+import java.io.FileOutputStream;
+
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -8,6 +10,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+
+import android.os.Environment;
 
 import com.example.howler.DatabaseHelper;
 import com.example.howler.RecorderActivity;
@@ -30,7 +34,14 @@ public class MessageUploadRequest extends SpringAndroidSpiceRequest<String>  {
 		
 	    MultiValueMap<String, Object> parts = new LinkedMultiValueMap<String, Object>();
 	    parts.add("message_id", message.getMessage_id());
-	    parts.add("data", new FileSystemResource(RecorderActivity.filePath()));
+	    
+        String path = Environment.getDataDirectory().getAbsolutePath() + "/data/com.example.howler/tempsendingfile";
+
+	    FileOutputStream fos = new FileOutputStream(path);
+	    fos.write(message.getData());
+	    fos.close();
+	    FileSystemResource res = new FileSystemResource(path);
+	    parts.add("data", res);
 	    
 	    HttpHeaders headers = new HttpHeaders();
 	    headers.setContentType(MediaType.MULTIPART_FORM_DATA);
