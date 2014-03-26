@@ -14,9 +14,11 @@ import com.octo.android.robospice.request.listener.RequestListener;
 import com.example.howler.WebRequest.JsonSpiceService;
 
 
+
 import android.os.Bundle;
 import android.os.Environment;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.util.Log;
 import android.view.Menu;
@@ -100,17 +102,31 @@ public class MessagesList extends Activity {
 			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 			LinearLayout layout = new LinearLayout(getApplicationContext());
 			LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-			
 			layout.setOrientation(LinearLayout.VERTICAL);
 			layout.setLayoutParams(params);
 			Button btnMessage = new Button(getApplicationContext());
 			btnMessage.setLayoutParams(buttonParams);
 			btnMessage.setText(message);
-			
+			btnMessage.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					playBack(message);
+				}
+			});
 			layout.addView(btnMessage);
-			main.addView(layout);
-			
+			main.addView(layout);		
 		}	
+	}
+	public void playBack(String message){
+		Toast.makeText(MessagesList.this, "message trying to play is:" + message, Toast.LENGTH_LONG).show();
+		//AlertDialog.Builder builder = new AlertDialog.Builder(getApplication());
+		//builder.setMessage("MESSAGE:" + message)
+		//		.setTitle("TITLE");
+		//AlertDialog dialog = builder.create();
+		//dialog.show();
+		
+			
 	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
