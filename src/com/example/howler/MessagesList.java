@@ -1,8 +1,13 @@
 package com.example.howler;
 
+import com.example.howler.WebRequest.MessageDataRequest;
 
 import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -10,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 
 import com.example.howler.WebRequest.Message;
+import com.example.howler.WebRequest.MessageDataRequest;
+import com.example.howler.WebRequest.MessageDownload;
 import com.example.howler.WebRequest.MessagesListRequest;
 import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.exception.SpiceException;
@@ -18,11 +25,19 @@ import com.example.howler.WebRequest.JsonSpiceService;
 
 
 
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DownloadManager;
+import android.app.DownloadManager.Query;
+import android.app.DownloadManager.Request;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -83,7 +98,6 @@ public class MessagesList extends Activity {
 		MessagesList.this.setProgressBarIndeterminateVisibility(true);
 		MessagesListRequest request = new MessagesListRequest(dh);
 		spiceManager.execute(request, new MessageListRequestListener());
-		//spiceManager.execute(request, Message.List, DurationInMillis.ALWAYS_EXPIRED, new MessageListRequestListener());
 	
 	}
 	/*
@@ -125,16 +139,18 @@ public class MessagesList extends Activity {
 			main.addView(layout);		
 		}	
 	}
+	
 	public void playBack(Message m){
-		Toast.makeText(MessagesList.this, "message trying to play is:" + m.getUsername(), Toast.LENGTH_LONG).show();
+		Toast.makeText(MessagesList.this, "message trying to play is:" + m.getUsername() + m.getMessage_id(), Toast.LENGTH_LONG).show();
 		//AlertDialog.Builder builder = new AlertDialog.Builder(getApplication());
 		//builder.setMessage("MESSAGE:" + message)
 		//		.setTitle("TITLE");
 		//AlertDialog dialog = builder.create();
 		//dialog.show();
-		
-		
-		
+		MessagesList.this.setProgressBarIndeterminateVisibility(true);
+		MessageDataRequest request = new MessageDataRequest(dh, m.getMessage_id());
+		spiceManager.execute(request, new MessageDownloadRequestListener());
+	
 			
 	}
 	@Override
@@ -145,11 +161,11 @@ public class MessagesList extends Activity {
 		return true;
 	}
 	
-	private class MessageListRequestListener implements RequestListener<Message.List> {
-
+	private class MessageDownloadRequestListener implements RequestListener<MessageDownload> {
+		
 		@Override
 		public void onRequestFailure(SpiceException exception) {
-			Log.e(TAG, "failure" + exception.getMessage());
+			Log.e(TAG, "message download failure" + exception.getMessage());
 
 			// detect invalid auth
 			if (exception.getCause() instanceof HttpClientErrorException) {
@@ -164,11 +180,62 @@ public class MessagesList extends Activity {
 		}
 
 		@Override
-		public void onRequestSuccess(Message.List messages) {
+		public void onRequestSuccess(MessageDownload download) {
+
+			Log.d(TAG, "success messages data length: " + download.getData().length);	
+			playAudio(download.getData());
 			
+		}
+		
+	}
+	
+	private void playAudio(byte[] soundArray) {
+	    try {
+	        // create temp file that will hold byte array
+	        File temp = File.createTempFile("temp", "wave", getCacheDir());
+	        String path = temp.getAbsolutePath();
+	        
+	        temp.deleteOnExit();
+	        FileOutputStream fos = new FileOutputStream(temp);
+	        fos.write(soundArray);
+	        fos.close();
+ 
+	        MediaPlayer mediaPlayer = new MediaPlayer();
+	        FileInputStream fis = new FileInputStream(temp);
+	        
+	        Log.v(TAG, "playing audio wuut: " + path);
+
+	        mediaPlayer.setDataSource(fis.getFD());
+
+	        mediaPlayer.prepare();
+	        mediaPlayer.start();
+	    } catch (IOException ex) {
+	        String s = ex.toString();
+	        ex.printStackTrace();
+	    }
+	}
+	
+	private class MessageListRequestListener implements RequestListener<Message.List> {
+
+		@Override
+		public void onRequestFailure(SpiceException exception) {
+			Log.e(TAG, "message list failure" + exception.getMessage());
+			// detect invalid auth
+			if (exception.getCause() instanceof HttpClientErrorException) {
+				HttpClientErrorException e = (HttpClientErrorException)exception.getCause();
+				if (e.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
+					dh.clearPesistentUser();
+					Intent intent = new Intent(MessagesList.this, LoginActivity.class);
+					MessagesList.this.startActivity(intent);
+					finish();
+				}
+			}
+		}
+
+		@Override
+		public void onRequestSuccess(Message.List messages) {
 			DisplayMessageList(messages.getMessages());
 			Log.d(TAG, "success, number of messages: " + messages.getMessages().size());	
-			
 		}
 		
 	}
