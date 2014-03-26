@@ -13,20 +13,21 @@ import org.springframework.web.client.RestTemplate;
 
 import android.util.Log;
 
+import com.example.howler.DatabaseHelper;
 import com.octo.android.robospice.request.springandroid.SpringAndroidSpiceRequest;
 
-public class FriendsListRequest extends SpringAndroidSpiceRequest<FriendListObject> {
-
-	private static final String TAG = "Friends List Request";
-	private String auth_token;
+public class AddFriendRequest extends SpringAndroidSpiceRequest<Username> {
+private static final String TAG = "Friends List Request";
 	
-	public FriendsListRequest(String auth_token) {
-		super(FriendListObject.class);
-		this.auth_token = auth_token;
+	private String username;
+	
+	public AddFriendRequest(String username) {
+		super(Username.class);
+		this.username = username;
 	}
 
 	@Override
-	public FriendListObject loadDataFromNetwork() throws Exception {
+	public Username loadDataFromNetwork() throws Exception {
 		String url = JsonSpiceService.baseURL + "friends";
 
 		ClientHttpRequestFactory fac = new HttpComponentsClientHttpRequestFactory() {
@@ -38,7 +39,7 @@ public class FriendsListRequest extends SpringAndroidSpiceRequest<FriendListObje
 				uriRequest.addHeader(
 						"Content-Type",
 						MediaType.APPLICATION_JSON_VALUE);
-				uriRequest.addHeader("Authorization", auth_token);
+				uriRequest.addHeader("Authorization", "RHzITQk2rltEjUjx1B813I0zTJ3gaqIemq6G7PJ4W7FBuyMHYK");
 				return uriRequest;
 			}
 
@@ -52,6 +53,6 @@ public class FriendsListRequest extends SpringAndroidSpiceRequest<FriendListObje
 
 		RestTemplate restTemplate = getRestTemplate();
 		restTemplate.setRequestFactory(fac);
-		return restTemplate.getForObject(url, FriendListObject.class);
+		return restTemplate.postForObject(url, this.username, Username.class);
 	}
 }

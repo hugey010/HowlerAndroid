@@ -1,5 +1,12 @@
 package com.example.howler;
 
+import java.io.File;
+import java.io.FilenameFilter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import com.example.howler.WebRequest.Friend;
 import com.example.howler.WebRequest.FriendListObject;
 import com.example.howler.WebRequest.FriendsListRequest;
 import com.example.howler.WebRequest.JsonSpiceService;
@@ -9,6 +16,7 @@ import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 
 import android.os.Bundle;
+import android.os.Environment;
 import android.app.Activity;
 import android.content.Intent;
 import android.text.Editable;
@@ -21,11 +29,18 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 public class FriendsList extends Activity {
 	private static final String TAG = "Friends List Activity";
 	private EditText searchFriend;
 	protected SpiceManager spiceManager = new SpiceManager(JsonSpiceService.class);
+	private DatabaseHelper dh;
+	private List<String> friend_list;
+	private LinearLayout main;
 
 	@Override
 	public void onStop() {
@@ -85,14 +100,14 @@ public class FriendsList extends Activity {
 		searchFriend.addTextChangedListener(mTextWatcher);
 
 		checkFieldsForEmptyValues();			
-		
+
 		//get logout button and assign Click Listener
 		Button logoutButton = (Button) findViewById(R.id.logout_button);
 		logoutButton.setOnClickListener(new View.OnClickListener() {		
 			@Override
 			public void onClick(View arg0) {
 				// TODO
-				
+
 			}
 		});
 
@@ -126,12 +141,54 @@ public class FriendsList extends Activity {
 			}
 		});
 
+		dh = new DatabaseHelper(this.getApplicationContext());
+
 		// send request
-		//FriendsListFragment.this.setProgressBarIndeterminateVisibility(true);
+		FriendsList.this.setProgressBarIndeterminateVisibility(true);
 		FriendListObject friendList = new FriendListObject();
-		FriendsListRequest request = new FriendsListRequest();
+		FriendsListRequest request = new FriendsListRequest(dh.authToken());
 		spiceManager.execute(request, friendList, DurationInMillis.ALWAYS_EXPIRED, new FriendsListRequestListener());
 
+		populateFriendList(friendList);
+		displayFriends();
+	}
+
+	public void populateFriendList(FriendListObject friendList){
+		friend_list = new ArrayList<String>();
+		//List<Friend> friends = friendList.getFriends();
+	}
+
+	public void displayFriends() {
+		main =(LinearLayout) findViewById(R.id.friends);
+		if (friend_list.size() == 0) {
+			Log.d(TAG, "No Friends");
+			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+			LinearLayout layout = new LinearLayout(getApplicationContext());
+			LinearLayout.LayoutParams textparams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+			layout.setOrientation(LinearLayout.VERTICAL);
+			layout.setLayoutParams(params);
+			TextView none = new TextView(getApplicationContext());
+			none.setLayoutParams(textparams);
+			none.setText("No Friends :(");
+			layout.addView(none);
+			main.addView(layout);
+		} else {
+			Log.d(TAG, "Num of friends: "+friend_list.size());
+			for(final String message : friend_list){
+				LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+				LinearLayout layout = new LinearLayout(getApplicationContext());
+				LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+
+				layout.setOrientation(LinearLayout.VERTICAL);
+				layout.setLayoutParams(params);
+				Button btnMessage = new Button(getApplicationContext());
+				btnMessage.setLayoutParams(buttonParams);
+				btnMessage.setText(message);
+
+				layout.addView(btnMessage);
+				main.addView(layout);	
+			}	
+		}
 	}
 
 	@Override
@@ -140,7 +197,7 @@ public class FriendsList extends Activity {
 		getMenuInflater().inflate(R.menu.friends_list, menu);
 		return true;
 	}
-	
+
 	private class FriendsListRequestListener implements RequestListener<FriendListObject> {
 
 		@Override
@@ -152,7 +209,7 @@ public class FriendsList extends Activity {
 		public void onRequestSuccess(FriendListObject friends) {
 			Log.d(TAG, "success, number of messages: " + friends.getFriends().size() + " friends: " + friends.getFriends());			
 		}
-		
+
 	}
 
 }
