@@ -3,15 +3,12 @@ package com.example.howler;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import com.example.howler.WebRequest.Message;
-import com.example.howler.WebRequest.MessageListObject;
 import com.example.howler.WebRequest.MessagesListRequest;
 import com.octo.android.robospice.SpiceManager;
-import com.octo.android.robospice.persistence.DurationInMillis;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 import com.example.howler.WebRequest.JsonSpiceService;
@@ -26,12 +23,10 @@ import android.content.Intent;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 public class MessagesList extends Activity {
@@ -39,6 +34,7 @@ public class MessagesList extends Activity {
 	
 	private List<String> messageList;
 	private LinearLayout main;
+	private DatabaseHelper dh;
 
 
 	private static final String TAG = "Messages List Activity";
@@ -80,12 +76,13 @@ public class MessagesList extends Activity {
 			}
 		});
 		
+		dh = new DatabaseHelper(this.getApplicationContext());
+		
 		// send request
 		MessagesList.this.setProgressBarIndeterminateVisibility(true);
-		MessageListObject messageList = new MessageListObject();
-		MessagesListRequest request = new MessagesListRequest();
-		//spiceManager.execute(request, new MessageListRequestListener());
-		spiceManager.execute(request, messageList, DurationInMillis.ALWAYS_EXPIRED, new MessageListRequestListener());
+		MessagesListRequest request = new MessagesListRequest(dh.authToken());
+		spiceManager.execute(request, new MessageListRequestListener());
+		//spiceManager.execute(request, Message.List, DurationInMillis.ALWAYS_EXPIRED, new MessageListRequestListener());
 	
 	}
 	public void PopulateMessageList(){
@@ -139,7 +136,7 @@ public class MessagesList extends Activity {
 		return true;
 	}
 	
-	private class MessageListRequestListener implements RequestListener<MessageListObject> {
+	private class MessageListRequestListener implements RequestListener<Message.List> {
 
 		@Override
 		public void onRequestFailure(SpiceException exception) {
@@ -149,10 +146,11 @@ public class MessagesList extends Activity {
 		}
 
 		@Override
-		public void onRequestSuccess(MessageListObject messages) {
+		public void onRequestSuccess(Message.List messages) {
 			
 			
-			Log.d(TAG, "success, number of messages: " + messages.getMessages().size() + " msss: " + messages.getMessages());			
+			Log.d(TAG, "success, number of messages: " + messages.getMessages().size() + " msss: " + messages.getMessages().get(0).getTitle());	
+			
 		}
 		
 	}
