@@ -4,7 +4,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
@@ -49,6 +51,7 @@ public class FriendsList extends Activity {
 	private DatabaseHelper dh;
 	private List<Friend> friend_list;
 	private LinearLayout main;
+	private List<LinearLayout> dynamicallyAddedViews = new ArrayList<LinearLayout>();
 
 	@Override
 	public void onStop() {
@@ -252,11 +255,12 @@ public class FriendsList extends Activity {
 		
 	}
 
-	public void populateFriendList(Friend.List friendList){
-		friend_list = friendList.getFriends();
-	}
-
 	public void displayFriends() {
+		for (LinearLayout l : dynamicallyAddedViews) {
+			main.removeView(l);
+		}
+		dynamicallyAddedViews.clear();
+		
 		main =(LinearLayout) findViewById(R.id.friends);
 		if (friend_list.size() == 0) {
 			Log.d(TAG, "No Friends");
@@ -298,7 +302,9 @@ public class FriendsList extends Activity {
 							username.setUsername(((Button)v).getText().toString());
 							Log.d(TAG, "username: "+username.getUsername());
 							FriendsList.this.setProgressBarIndeterminateVisibility(true);
-							ConfirmFriendRequest request = new ConfirmFriendRequest(username, dh.authToken());
+							Log.d(TAG, "friend id = " + friend.getIdentifier());
+							ConfirmFriendRequest request = new ConfirmFriendRequest(friend, dh.authToken());
+							
 							spiceManager.execute(request, username, DurationInMillis.ALWAYS_EXPIRED, new ConfirmFriendRequestListener());
 						}
 					});
@@ -307,7 +313,9 @@ public class FriendsList extends Activity {
 				}
 
 				layout.addView(btnMessage);
-				main.addView(layout);	
+				main.addView(layout);
+				
+				dynamicallyAddedViews.add(layout);
 			}	
 		}
 	}
@@ -340,7 +348,7 @@ public class FriendsList extends Activity {
 		public void onRequestSuccess(Friend.List friends) {
 			Log.d(TAG, "success, number of friends: " + friends.getFriends().size() + " friends: " + friends.getFriends());
 
-			populateFriendList(friends);
+			friend_list = friends.getFriends();
 			displayFriends();
 		}
 
@@ -398,9 +406,15 @@ public class FriendsList extends Activity {
 			Log.d(TAG, "success: "+error.isSuccess()+" message: " + error.getMessage());
 			if (error.isSuccess()) {
 				Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
+				
 			} else {
 				Toast.makeText(getApplicationContext(), "Failed to confirm friend: "+error.getMessage(), Toast.LENGTH_LONG).show();
 			}
+			// send request
+			FriendsList.this.setProgressBarIndeterminateVisibility(true);
+			FriendsListRequest request = new FriendsListRequest(dh.authToken());
+			spiceManager.execute(request, new FriendsListRequestListener());
+
 		}
 
 	}

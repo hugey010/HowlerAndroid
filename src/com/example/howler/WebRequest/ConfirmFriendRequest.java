@@ -4,10 +4,8 @@ import java.io.IOException;
 import java.net.URI;
 
 import org.apache.http.client.methods.HttpUriRequest;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -20,18 +18,20 @@ import com.octo.android.robospice.request.springandroid.SpringAndroidSpiceReques
 public class ConfirmFriendRequest extends SpringAndroidSpiceRequest<ErrorResponseObject> {
 	private static final String TAG = "Confirm Friend Request";
 
-	private Username username;
 	private String auth_token;
-	public ConfirmFriendRequest(Username username, String auth_token) {
+	private Friend friend;
+	
+	public ConfirmFriendRequest(Friend friend, String auth_token) {
 		super(ErrorResponseObject.class);
 		this.auth_token = auth_token;
-		this.username = username;
+		this.friend = friend;
 	}
 
 	@Override
 	public ErrorResponseObject loadDataFromNetwork() throws Exception {
 		String url = JsonSpiceService.baseURL + "confirmFriend";
 
+		
 		ClientHttpRequestFactory fac = new HttpComponentsClientHttpRequestFactory() {
 
 			@Override
@@ -53,12 +53,16 @@ public class ConfirmFriendRequest extends SpringAndroidSpiceRequest<ErrorRespons
 			}
 		};
 
+		
 		RestTemplate restTemplate = getRestTemplate();
 		restTemplate.setRequestFactory(fac);
-		//return restTemplate.put(url, this.username);
-		HttpEntity<Username> request = new HttpEntity<Username>(username);
-		ResponseEntity<ErrorResponseObject> entity = restTemplate.exchange(url, HttpMethod.PUT, request, ErrorResponseObject.class);
-		return entity.getBody();
+		
+		restTemplate.put(url, this.friend);
+		ErrorResponseObject object = new ErrorResponseObject();
+		object.setMessage("probably successful.");
+		object.setSuccess(true);
+		return object;
+
 	}
 	
 }
