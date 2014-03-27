@@ -52,6 +52,7 @@ public class FriendsList extends Activity {
 	private List<Friend> friend_list;
 	private LinearLayout main;
 	private List<LinearLayout> dynamicallyAddedViews = new ArrayList<LinearLayout>();
+	private List<String> selectedUsernames = new ArrayList<String>();
 
 	@Override
 	public void onStop() {
@@ -156,28 +157,12 @@ public class FriendsList extends Activity {
 		Button sendButton = (Button) findViewById(R.id.send_button);
 		sendButton.setOnClickListener(new View.OnClickListener() {
 			@Override
-			public void onClick(View v) {
-				// TODO action for send button
-				
-				// check input fields
+			public void onClick(View v) {				
+				// TODO: check input fields
 				
 				com.example.howler.WebRequest.Message message = new com.example.howler.WebRequest.Message();
 				message.setTitle(RecorderActivity.messageTitle());
-				//try {
-					//RandomAccessFile f = new RandomAccessFile(RecorderActivity.filePath(), "r");
-					//byte[] data = new byte[(int)f.length()];
-					//f.read(data);
-					//Log.v(TAG, "datalength = " + data.length);
-					//message.setData(data);
-					List<String> friends = new ArrayList<String>();
-					friends.add("hugey");
-					message.setUsernames(friends);
-					
-
-			
-				//} catch (Exception e) {
-				//	Log.v(TAG, "failed to upload multipart. could not read audio file");
-				//}
+				message.setUsernames(selectedUsernames);
 				
 				CreateMessageRequest request = new CreateMessageRequest(dh, message);
 				spiceManager.execute(request, message, DurationInMillis.ALWAYS_EXPIRED, new CreateMessageRequestListener());
@@ -297,7 +282,7 @@ public class FriendsList extends Activity {
 					btnMessage.setOnClickListener(new View.OnClickListener() {
 						@Override
 						public void onClick(View v) {
-							// TODO action for confirming friend
+
 							Username username = new Username();
 							username.setUsername(((Button)v).getText().toString());
 							Log.d(TAG, "username: "+username.getUsername());
@@ -309,7 +294,25 @@ public class FriendsList extends Activity {
 						}
 					});
 				} else {
-					// TODO select friend for sending
+
+
+					btnMessage.setOnClickListener(new View.OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							
+							if (selectedUsernames.contains(friend.getUsername())) {
+								selectedUsernames.remove(friend.getUsername());
+								v.setBackgroundColor(Color.GRAY);
+
+							} else {
+								selectedUsernames.add(friend.getUsername());
+								v.setBackgroundColor(Color.RED);
+							}
+							
+							Log.v(TAG, "friend = " + friend.getUsername());
+						}
+					});
+
 				}
 
 				layout.addView(btnMessage);
