@@ -151,49 +151,11 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
 		return true;
 	}
 	
-	
-	
-	/*
-	private void startRecording(){
-        try{
-    			//int intSize = android.media.AudioTrack.getMinBufferSize(8000, AudioFormat.CHANNEL_IN_STEREO,
-    			//AudioFormat.ENCODING_PCM_16BIT); 
-    			//AudioTrack at = new AudioTrack(AudioManager.STREAM_MUSIC, 8000, AudioFormat.CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_16BIT, intSize, AudioTrack.MODE_STREAM);
-            int bufferSize = AudioRecord.getMinBufferSize(44100, AudioFormat.CHANNEL_IN_STEREO, AudioFormat.ENCODING_PCM_16BIT); 
-        	//voiceRecorder = new AudioRecord(AudioManager., 44100, AudioFormat.CHANNEL_IN_STEREO, AudioFormat.ENCODING_PCM_16BIT, AudioTrack.MODE_STREAM);
-        	
-        	
-            String title = this.titleEditableField.getText().toString();
-            audioFile = Environment.getDataDirectory().getAbsolutePath() + "/data/com.example.howler/" + title + ".mp4";
-    		Toast.makeText(RecorderActivity.this, "recording file in: " + audioFile, Toast.LENGTH_LONG).show();	
-        	//voiceRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        	//voiceRecorder.setOutputFormat(MediaRecorder.OutputFormat.);
-        	//voiceRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-        	//voiceRecorder.setOutputFile(audioFile);
-        	//voiceRecorder.prepare();
-        	//voiceRecorder.start();
-        	title = null;
-        } catch(IOException e){
-        	e.printStackTrace();
-        }
-	}
-	*/
-	
-	/*
-	private void stopRecording(){
-		Toast.makeText(RecorderActivity.this, "stopped recording", Toast.LENGTH_LONG).show();
-		voiceRecorder.stop();
-		voiceRecorder.release();
-		voiceRecorder = null;
-		btnPlay.setClickable(true);
-		btnDelete.setClickable(true);
-		btnRecord.setClickable(false);
-	}
-	*/
-	
 	private void playRecording() throws Exception{
 		//voicePlayer = new MediaPlayer();
-		Toast.makeText(RecorderActivity.this, "started playing file at" + audioFile, Toast.LENGTH_LONG).show();
+		if (audioFile != null) {
+			Toast.makeText(RecorderActivity.this, "started playing file at " + audioFile, Toast.LENGTH_LONG).show();
+		}
 		//voicePlayer.setDataSource(audioFile);
 		//voicePlayer.prepare();
 		//voicePlayer.start();	
@@ -228,7 +190,7 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
 			alert.show();			
 		}
 		else {
-			Toast.makeText(RecorderActivity.this, audioFile + "deleted", Toast.LENGTH_LONG).show();
+			Toast.makeText(RecorderActivity.this, audioFile + " deleted", Toast.LENGTH_LONG).show();
 			File outFile = new File(audioFile);
 			outFile.delete();
 			audioFile = null;
@@ -270,6 +232,7 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
 
         String title = this.titleEditableField.getText().toString();
         audioFile = Environment.getDataDirectory().getAbsolutePath() + "/data/com.example.howler/" + title + ".pcm";
+		Toast.makeText(RecorderActivity.this, "recording file in: " + audioFile, Toast.LENGTH_LONG).show();	
 		
         int buffSize = AudioRecord.getMinBufferSize(44100, AudioFormat.CHANNEL_IN_STEREO, AudioFormat.ENCODING_PCM_16BIT);
 
