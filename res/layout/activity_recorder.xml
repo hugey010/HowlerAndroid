@@ -65,24 +65,6 @@
         android:clickable="false"/>
 
     <TextView
-        android:id="@+id/audio_pos_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/recipient_volume"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="33dp"
-        android:text="@string/set_recip_vol" />
-
-    <SeekBar
-        android:id="@+id/recipient_volume"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_marginBottom="54dp" />
-
-    <TextView
         android:id="@+id/instr"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -106,10 +88,19 @@
         android:id="@+id/record_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/play_button"
+        android:layout_below="@+id/record_instructions"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
         android:padding="5dp"
         android:src="@drawable/record_button" />
+
+    <TextView
+        android:id="@+id/record_instructions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/play_button"
+        android:layout_margin="10dp"
+        android:gravity="center"
+        android:layout_centerHorizontal="true"
+        android:text="@string/record_instruction_text" />
 
 </RelativeLayout>

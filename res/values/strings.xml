@@ -26,5 +26,6 @@
     <string name="set_audio_pos">Set Audio Position</string>
     <string name="title_activity_friends_list">FriendsList</string>
     <string name="title_activity_messages_list">MessagesList</string>
+    <string name="record_instruction_text">Press the button below to record a message.\nPress again to stop recording.\n</string>
 
 </resources>
