@@ -175,7 +175,9 @@ public class FriendsList extends Activity {
 		FriendsListRequest request = new FriendsListRequest(dh.authToken());
 		spiceManager.execute(request, new FriendsListRequestListener());
 
-
+		friend_list = dh.getAllFriends();
+		Log.d(TAG, "Retrieved friend list: "+friend_list.size());
+		displayFriends();
 	}
 	
 	private class CreateMessageRequestListener implements RequestListener<com.example.howler.WebRequest.Message> {
@@ -351,10 +353,17 @@ public class FriendsList extends Activity {
 		public void onRequestSuccess(Friend.List friends) {
 			Log.d(TAG, "success, number of friends: " + friends.getFriends().size() + " friends: " + friends.getFriends());
 
-			friend_list = friends.getFriends();
+			List<Friend> friends_list = friends.getFriends();
+			saveFriendsToDb(friends_list);
 			displayFriends();
 		}
 
+	}
+	
+	private void saveFriendsToDb(List<Friend> friends) {
+		for (int i=0; i<friends.size(); i++) {
+			dh.insertFriend(friends.get(i));
+		}
 	}
 
 	private class AddFriendRequestListener implements RequestListener<ErrorResponseObject> {
