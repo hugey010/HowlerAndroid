@@ -14,10 +14,10 @@ import org.springframework.web.client.RestTemplate;
 import android.os.Environment;
 
 import com.example.howler.DatabaseHelper;
-import com.example.howler.RecorderActivity;
 import com.octo.android.robospice.request.springandroid.SpringAndroidSpiceRequest;
 
 public class MessageUploadRequest extends SpringAndroidSpiceRequest<String>  {
+	@SuppressWarnings("unused")
 	private static final String TAG = "MessageUploadRequest";
 	private DatabaseHelper db;
 	private Message message;

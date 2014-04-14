@@ -14,17 +14,16 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 public class CreateAccount extends Activity implements OnClickListener {
 	
+	@SuppressWarnings("unused")
 	private final static String TAG = "CreateAccount Activity";
 
 	protected SpiceManager spiceManager = new SpiceManager(JsonSpiceService.class);
@@ -33,7 +32,6 @@ public class CreateAccount extends Activity implements OnClickListener {
 	private EditText etPassword;
 	private EditText etConfirm;
 	private EditText etEmail;
-	private DatabaseHelper dh;
 
 	@Override
 	public void onStart() {

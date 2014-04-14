@@ -1,12 +1,8 @@
 package com.example.howler;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
@@ -26,7 +22,6 @@ import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 
 import android.os.Bundle;
-import android.os.Message;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
@@ -143,7 +138,6 @@ public class FriendsList extends Activity {
 		addFriendButton.setOnClickListener(new View.OnClickListener() {			
 			@Override
 			public void onClick(View v) {
-				// TODO action for add friend
 				Username username = new Username();
 				username.setUsername(searchFriend.getText().toString());
 				Log.d(TAG, "username to add: "+username.getUsername());
@@ -159,11 +153,11 @@ public class FriendsList extends Activity {
 			@Override
 			public void onClick(View v) {				
 				// TODO: check input fields
-				
+
 				com.example.howler.WebRequest.Message message = new com.example.howler.WebRequest.Message();
 				message.setTitle(RecorderActivity.messageTitle());
 				message.setUsernames(selectedUsernames);
-				
+
 				CreateMessageRequest request = new CreateMessageRequest(dh, message);
 				spiceManager.execute(request, message, DurationInMillis.ALWAYS_EXPIRED, new CreateMessageRequestListener());
 
@@ -179,7 +173,7 @@ public class FriendsList extends Activity {
 		Log.d(TAG, "Retrieved friend list: "+friend_list.size());
 		displayFriends();
 	}
-	
+
 	private class CreateMessageRequestListener implements RequestListener<com.example.howler.WebRequest.Message> {
 
 		@Override
@@ -200,23 +194,23 @@ public class FriendsList extends Activity {
 		public void onRequestSuccess(com.example.howler.WebRequest.Message message) {
 			// multipart upload of data
 			Log.v(TAG, "created message id: " + message.getMessage_id() + ", title: " + message.getTitle());
-			
+
 			message.setTitle(RecorderActivity.messageTitle());
 			try {
-				 RandomAccessFile f = new RandomAccessFile(RecorderActivity.filePath(), "r");
-				 byte[] data = new byte[(int)f.length()];
-				 f.read(data);
-				 Log.v(TAG, "datalength = " + data.length);
-				 message.setData(data);
+				RandomAccessFile f = new RandomAccessFile(RecorderActivity.filePath(), "r");
+				byte[] data = new byte[(int)f.length()];
+				f.read(data);
+				Log.v(TAG, "datalength = " + data.length);
+				message.setData(data);
 				MessageUploadRequest  request = new MessageUploadRequest(dh, message);
 				spiceManager.execute(request, message, DurationInMillis.ALWAYS_EXPIRED, new UploadMessageRequestListener());
-
+				f.close();
 			} catch (Exception e) {
 				Log.v(TAG, "failed to upload multipart. could not read audio file");
 			}
 		}
 	}
-	
+
 	private class UploadMessageRequestListener implements RequestListener<String> {
 
 		@Override
@@ -239,7 +233,7 @@ public class FriendsList extends Activity {
 			//Log.v(TAG, "uploaded message id: " + message.getMessage_id() + ", title: " + message.getTitle());
 			Log.v(TAG, "upload success string: " + s);
 		}
-		
+
 	}
 
 	public void displayFriends() {
@@ -247,7 +241,7 @@ public class FriendsList extends Activity {
 			main.removeView(l);
 		}
 		dynamicallyAddedViews.clear();
-		
+
 		main =(LinearLayout) findViewById(R.id.friends);
 		if (friend_list.size() == 0) {
 			Log.d(TAG, "No Friends");
@@ -291,7 +285,7 @@ public class FriendsList extends Activity {
 							FriendsList.this.setProgressBarIndeterminateVisibility(true);
 							Log.d(TAG, "friend id = " + friend.getIdentifier());
 							ConfirmFriendRequest request = new ConfirmFriendRequest(friend, dh.authToken());
-							
+
 							spiceManager.execute(request, username, DurationInMillis.ALWAYS_EXPIRED, new ConfirmFriendRequestListener());
 						}
 					});
@@ -301,7 +295,7 @@ public class FriendsList extends Activity {
 					btnMessage.setOnClickListener(new View.OnClickListener() {
 						@Override
 						public void onClick(View v) {
-							
+
 							if (selectedUsernames.contains(friend.getUsername())) {
 								selectedUsernames.remove(friend.getUsername());
 								v.setBackgroundColor(Color.GRAY);
@@ -310,7 +304,7 @@ public class FriendsList extends Activity {
 								selectedUsernames.add(friend.getUsername());
 								v.setBackgroundColor(Color.RED);
 							}
-							
+
 							Log.v(TAG, "friend = " + friend.getUsername());
 						}
 					});
@@ -319,7 +313,7 @@ public class FriendsList extends Activity {
 
 				layout.addView(btnMessage);
 				main.addView(layout);
-				
+
 				dynamicallyAddedViews.add(layout);
 			}	
 		}
@@ -359,7 +353,7 @@ public class FriendsList extends Activity {
 		}
 
 	}
-	
+
 	private void saveFriendsToDb(List<Friend> friends) {
 		for (int i=0; i<friends.size(); i++) {
 			dh.insertFriend(friends.get(i));
@@ -418,7 +412,7 @@ public class FriendsList extends Activity {
 			Log.d(TAG, "success: "+error.isSuccess()+" message: " + error.getMessage());
 			if (error.isSuccess()) {
 				Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
-				
+
 			} else {
 				Toast.makeText(getApplicationContext(), "Failed to confirm friend: "+error.getMessage(), Toast.LENGTH_LONG).show();
 			}
