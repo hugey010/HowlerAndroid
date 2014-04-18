@@ -43,6 +43,7 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
 	private View btnPlay;
 	private View btnRecord;
 	private View btnDelete;
+	private View btnSend;
 	private View btnFriendsList;
 	private View btnMessagesList;
 	final Context context = this;
@@ -78,6 +79,7 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
 		Button playButton = (Button) findViewById(R.id.play_button);
 		ImageButton recordButton = (ImageButton) findViewById(R.id.record_button);
 		Button deleteButton = (Button) findViewById(R.id.delete_button);
+		Button sendButton = (Button) findViewById(R.id.send_button);
 
 		String title = titleEditableField.getText().toString();
 		messageTitle = title;
@@ -86,11 +88,13 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
 			playButton.setEnabled(true);
 			recordButton.setEnabled(true);
 			deleteButton.setEnabled(true);
+			sendButton.setEnabled(true);
 
 		} else {
 			playButton.setEnabled(false);
 			recordButton.setEnabled(false);
 			deleteButton.setEnabled(false);
+			sendButton.setEnabled(false);
 		}
 	}		
 	
@@ -103,6 +107,8 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
 		setContentView(R.layout.activity_recorder);
 		btnRecord = (ImageButton) findViewById(R.id.record_button);
 		btnRecord.setOnClickListener(this);
+		btnSend = (Button) findViewById(R.id.send_button);
+		btnSend.setOnClickListener(this);
 		btnFriendsList = (Button) findViewById(R.id.friends_button);
 		btnFriendsList.setOnClickListener(this);
 		btnMessagesList = (Button) findViewById(R.id.message_list_button);
@@ -187,7 +193,7 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
 			alert.show();			
 		}
 		else {
-			Toast.makeText(RecorderActivity.this, audioFile + " deleted", Toast.LENGTH_LONG).show();
+			Toast.makeText(RecorderActivity.this, "Message deleted!", Toast.LENGTH_LONG).show();
 			File outFile = new File(audioFile);
 			outFile.delete();
 			audioFile = null;
@@ -229,8 +235,7 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
 
         String title = this.titleEditableField.getText().toString();
         audioFile = Environment.getDataDirectory().getAbsolutePath() + "/data/com.example.howler/" + title + ".pcm";
-		Toast.makeText(RecorderActivity.this, "recording file in: " + audioFile, Toast.LENGTH_LONG).show();	
-		
+        Toast.makeText(RecorderActivity.this, "Begin Recording", Toast.LENGTH_LONG).show();
         int buffSize = AudioRecord.getMinBufferSize(44100, AudioFormat.CHANNEL_IN_STEREO, AudioFormat.ENCODING_PCM_16BIT);
 
         //findAudioRecord();
@@ -295,7 +300,6 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
 
 	private void stopRecording() {
 	    // stops the recording activity
-		Toast.makeText(RecorderActivity.this, "stopped recording", Toast.LENGTH_LONG).show();
 
 	    if (null != voiceRecorder) {
 	        isRecording = false;
@@ -304,7 +308,7 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
 	        voiceRecorder = null;
 	        recordingThread = null;
 	    }
-	    
+	    Toast.makeText(RecorderActivity.this, "Recording Ended", Toast.LENGTH_LONG).show();	    
 		btnPlay.setClickable(true);
 		btnDelete.setClickable(true);
 		btnRecord.setClickable(false);
@@ -394,6 +398,10 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+		case R.id.send_button:
+    		Intent intent = new Intent(getApplicationContext(), com.example.howler.FriendsList.class);
+    		startActivity(intent);				
+			break;			
 		}	
 	}
 }
