@@ -347,8 +347,8 @@ public class FriendsList extends Activity {
 		public void onRequestSuccess(Friend.List friends) {
 			Log.d(TAG, "success, number of friends: " + friends.getFriends().size() + " friends: " + friends.getFriends());
 
-			List<Friend> friends_list = friends.getFriends();
-			saveFriendsToDb(friends_list);
+			friend_list = friends.getFriends();
+			saveFriendsToDb(friend_list);
 			displayFriends();
 		}
 
