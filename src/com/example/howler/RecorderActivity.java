@@ -399,7 +399,7 @@ public class RecorderActivity extends FragmentActivity implements OnClickListene
 				e.printStackTrace();
 			}
 		case R.id.send_button:
-    		Intent intent = new Intent(getApplicationContext(), com.example.howler.FriendsList.class);
+    		Intent intent= new Intent(getApplicationContext(), com.example.howler.FriendsList.class);
     		startActivity(intent);				
 			break;			
 		}	
